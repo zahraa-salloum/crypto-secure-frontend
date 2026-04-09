@@ -1,0 +1,267 @@
+<app-navbar></app-navbar>
+
+<div class="files-container">
+  <div class="container">
+    <!-- Header -->
+    <div class="page-header">
+      <h1>📁 File Encryption</h1>
+      <p>Securely encrypt and store your files</p>
+    </div>
+    
+    <!-- Upload Section -->
+    <div class="upload-section card">
+      <div class="card-header">
+        <h3>📤 Upload & Encrypt File</h3>
+        <span class="file-count-badge" [class.at-limit]="atLimit">
+          {{ files().length }} / {{ FILE_LIMIT }} files
+        </span>
+      </div>
+      <div class="card-body">
+        @if (atLimit) {
+          <div class="alert alert-warning limit-warning">
+            <strong>⚠️ File limit reached.</strong>
+            You can store up to {{ FILE_LIMIT }} files. Please delete older files to upload new ones, or upgrade your plan for more storage.
+          </div>
+        }
+        <form [formGroup]="uploadForm">
+          <!-- File Upload -->
+          <div class="file-upload-area" [class.disabled]="atLimit" (click)="!atLimit && fileInput.click()">
+            @if (selectedFile()) {
+              <div class="file-selected">
+                <span class="file-icon">📄</span>
+                <div class="file-info">
+                  <h4>{{ selectedFile()!.name }}</h4>
+                  <p>{{ formatFileSize(selectedFile()!.size) }}</p>
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-danger"
+                  (click)="clearFile(); $event.stopPropagation()"
+                >
+                  Remove
+                </button>
+              </div>
+            } @else {
+              <div class="upload-placeholder">
+                <span class="upload-icon">☁️</span>
+                <h4>Click to select file</h4>
+                <p>or drag and drop</p>
+                <small>Max file size: 10MB</small>
+              </div>
+            }
+            <input
+              #fileInput
+              type="file"
+              (change)="onFileSelected($event)"
+              hidden
+              accept="*/*"
+            >
+          </div>
+          
+          <!-- Encryption Options -->
+          @if (selectedFile()) {
+            <div class="encryption-options">
+              <div class="form-group">
+                <label class="form-label">Encryption Algorithm</label>
+                <select formControlName="algorithm" class="form-control">
+                  <option value="RC4">RC4 - Variable key stream cipher</option>
+                  <option value="A5/1">A5/1 - GSM encryption cipher</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Encryption Key</label>
+                <input
+                  type="text"
+                  formControlName="key"
+                  class="form-control"
+                  placeholder="Auto-generated key"
+                  readonly
+                >
+                <div class="key-actions">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    (click)="copyKey()"
+                    [disabled]="!uploadForm.value.key"
+                    title="Copy key to clipboard"
+                  >
+                    📋
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    (click)="generateKey()"
+                  >
+                    🎲 Generate
+                  </button>
+                </div>
+                @if (uploadForm.get('key')?.invalid && uploadForm.get('key')?.touched) {
+                  <div class="invalid-feedback d-block">
+                    Encryption key is required
+                  </div>
+                }
+              </div>
+              
+              <button
+                type="button"
+                class="btn btn-primary btn-block"
+                (click)="uploadFile()"
+                [disabled]="uploadForm.invalid || uploading() || atLimit"
+              >
+                @if (uploading()) {
+                  <span class="spin">⏳</span> Uploading {{ uploadProgress() }}%
+                } @else {
+                  🔒 Encrypt & Upload
+                }
+              </button>
+            </div>
+          }
+        </form>
+        
+        <!-- Security Notice -->
+        <div class="alert alert-info security-notice">
+          <strong>🔒 Client-Side Encryption:</strong>
+          Your file is encrypted <strong>locally in your browser</strong> before upload.
+          The encryption key <strong>NEVER leaves your device</strong>!
+          <br><small>⚠️ Save your key securely - you'll need it to decrypt the file!</small>
+        </div>
+        
+        @if (uploadError()) {
+          <div class="alert alert-danger">
+            {{ uploadError() }}
+          </div>
+        }
+        
+        @if (uploadSuccess()) {
+          <div class="alert alert-success">
+            ✓ File encrypted and uploaded successfully!
+          </div>
+        }
+      </div>
+    </div>
+    
+    <!-- Files List -->
+    <div class="files-section">
+      <div class="section-header">
+        <h2>📂 Your Encrypted Files</h2>
+      </div>
+      
+      @if (loading()) {
+        <div class="loading-state">
+          <span class="spin">⏳</span>
+          <p>Loading files...</p>
+        </div>
+      } @else if (files().length === 0) {
+        <div class="empty-state">
+          <span class="empty-icon">📁</span>
+          <h3>No files yet</h3>
+          <p>Upload your first encrypted file to get started</p>
+        </div>
+      } @else {
+        <div class="files-list">
+          @for (file of files(); track file.id) {
+            <div class="file-item card">
+              <div class="file-header">
+                <span class="file-type-icon">{{ getFileIcon(file.original_filename) }}</span>
+                <div class="file-details">
+                  <h4>{{ file.original_filename }}</h4>
+                  <div class="file-meta">
+                    <span>{{ formatFileSize(file.file_size) }}</span>
+                    <span>•</span>
+                    <span class="badge badge-primary">{{ file.algorithm }}</span>
+                    <span>•</span>
+                    <span class="encryption-indicator encrypted">🔒 Encrypted</span>
+                  </div>
+                  <small class="file-date">Uploaded {{ formatDate(file.uploaded_at) }}</small>
+                </div>
+              </div>
+              
+              <div class="file-actions">
+                <button
+                  class="btn btn-sm btn-primary"
+                  (click)="showDecryptModal(file)"
+                  title="Decrypt & Download"
+                >
+                  🔓 Decrypt
+                </button>
+                <button
+                  class="btn btn-sm btn-danger"
+                  (click)="deleteFile(file.id)"
+                  title="Delete"
+                >
+                  🗑️ Delete
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+    
+    <!-- Decrypt Modal -->
+    @if (decryptingFile()) {
+      <div class="modal-overlay" (click)="decryptingFile.set(null)">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3>🔓 Decrypt File</h3>
+            <button class="close-btn" (click)="decryptingFile.set(null)">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="file-preview">
+              <span class="file-icon">{{ getFileIcon(decryptingFile()!.original_filename || '') }}</span>
+              <div>
+                <h4>{{ decryptingFile()!.original_filename }}</h4>
+                <p>{{ formatFileSize(decryptingFile()!.file_size) }}</p>
+              </div>
+            </div>
+            
+            <form [formGroup]="decryptForm">
+              <div class="form-group">
+                <label class="form-label">Encryption Key</label>
+                <input
+                  type="text"
+                  formControlName="decryptKey"
+                  class="form-control"
+                  placeholder="Enter the encryption key..."
+                  autofocus
+                >
+                @if (decryptForm.get('decryptKey')?.invalid && decryptForm.get('decryptKey')?.touched) {
+                  <div class="invalid-feedback d-block">
+                    Decryption key is required
+                  </div>
+                }
+              </div>
+            </form>
+            
+            @if (decryptError()) {
+              <div class="alert alert-danger">
+                {{ decryptError() }}
+              </div>
+            }
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline" (click)="decryptingFile.set(null)">Cancel</button>
+            <button
+              class="btn btn-primary"
+              (click)="downloadFile()"
+              [disabled]="decryptForm.invalid || downloading()"
+            >
+              @if (downloading()) {
+                <span class="spin">⏳</span> Decrypting...
+              } @else {
+                🔓 Decrypt & Download
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+    
+    <!-- Security Warning -->
+    <div class="alert alert-warning">
+      <strong>⚠️ Educational Purpose:</strong>
+      Files are encrypted using RC4/A5 for demonstration only. For production use, employ modern encryption standards like AES-256-GCM.
+    </div>
+  </div>
+</div>

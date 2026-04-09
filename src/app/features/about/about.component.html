@@ -1,0 +1,195 @@
+﻿<app-navbar></app-navbar>
+
+<div class="about-container">
+  <div class="container">
+    <!-- Hero Section -->
+    <div class="about-hero">
+      <h1>About CryptoStream</h1>
+      <p class="lead">
+        An educational platform demonstrating stream cipher cryptography through RC4 and A5/1 implementations
+      </p>
+    </div>
+    
+    <!-- Project Overview -->
+    <div class="card">
+      <div class="card-header">
+        <h2>📚 Project Overview</h2>
+      </div>
+      <div class="card-body">
+        <p>
+          <strong>CryptoStream</strong> is a comprehensive educational project created for a university cryptography course.
+          This platform demonstrates the implementation and practical applications of two historical stream ciphers:
+          <strong>RC4</strong> and <strong>A5/1</strong>.
+        </p>
+        
+        <p>
+          The project provides hands-on experience with cryptographic concepts including:
+        </p>
+        
+        <ul class="features-list">
+          <li>🔐 Stream cipher algorithms and implementations</li>
+          <li>🔑 Key scheduling and pseudo-random generation</li>
+          <li>📱 Symmetric encryption for text and files</li>
+          <li>💬 End-to-end encrypted messaging</li>
+          <li>🛡️ Security best practices and vulnerability awareness</li>
+        </ul>
+        
+        <div class="alert alert-warning">
+          <strong>⚠️ Educational Purpose Only</strong>
+          <p>
+            This project implements cryptographic algorithms that are now considered insecure and deprecated.
+            RC4 and A5/1 have known vulnerabilities and should <strong>never be used</strong> for protecting
+            sensitive real-world data. This implementation serves purely educational purposes to understand
+            cryptographic concepts and historical cipher designs.
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Technology Stack -->
+    <div class="card">
+      <div class="card-header">
+        <h2>⚙️ Technology Stack</h2>
+      </div>
+      <div class="card-body">
+        <div class="tech-grid">
+          <div class="tech-category">
+            <h3>Frontend</h3>
+            <div class="tech-items">
+              <span class="badge badge-primary">Angular 17+</span>
+              <span class="badge badge-primary">TypeScript</span>
+              <span class="badge badge-primary">SCSS</span>
+              <span class="badge badge-primary">Reactive Forms</span>
+            </div>
+          </div>
+          
+          <div class="tech-category">
+            <h3>Backend</h3>
+            <div class="tech-items">
+              <span class="badge badge-secondary">Laravel 11</span>
+              <span class="badge badge-secondary">PHP 8.2+</span>
+              <span class="badge badge-secondary">MySQL</span>
+              <span class="badge badge-secondary">RESTful API</span>
+            </div>
+          </div>
+          
+          <div class="tech-category">
+            <h3>Security</h3>
+            <div class="tech-items">
+              <span class="badge badge-accent">JWT Authentication</span>
+              <span class="badge badge-accent">CSRF Protection</span>
+              <span class="badge badge-accent">Input Validation</span>
+              <span class="badge badge-accent">XSS Prevention</span>
+            </div>
+          </div>
+          
+          <div class="tech-category">
+            <h3>Development</h3>
+            <div class="tech-items">
+              <span class="badge">Git</span>
+              <span class="badge">VS Code</span>
+              <span class="badge">Composer</span>
+              <span class="badge">npm</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Features -->
+    <div class="card">
+      <div class="card-header">
+        <h2>✨ Key Features</h2>
+      </div>
+      <div class="card-body">
+        <div class="features-grid">
+          <div class="feature-item">
+            <div class="feature-icon">🔐</div>
+            <h3>Text Encryption</h3>
+            <p>Encrypt and decrypt text messages using RC4 or A5/1 stream ciphers with customizable keys.</p>
+          </div>
+          
+          <div class="feature-item">
+            <div class="feature-icon">📁</div>
+            <h3>File Encryption</h3>
+            <p>Securely upload and encrypt files of various types, with encrypted storage and retrieval.</p>
+          </div>
+          
+          <div class="feature-item">
+            <div class="feature-icon">💬</div>
+            <h3>Encrypted Chat</h3>
+            <p>Real-time messaging with end-to-end encryption using stream cipher algorithms.</p>
+          </div>
+          
+          <div class="feature-item">
+            <div class="feature-icon">🔑</div>
+            <h3>Key Management</h3>
+            <p>Generate secure random keys and manage encryption keys for conversations and files.</p>
+          </div>
+          
+          <div class="feature-item">
+            <div class="feature-icon">👤</div>
+            <h3>User Authentication</h3>
+            <p>Secure registration and login with JWT-based authentication and session management.</p>
+          </div>
+          
+          <div class="feature-item">
+            <div class="feature-icon">📊</div>
+            <h3>Dashboard Analytics</h3>
+            <p>Track encryption activities, file uploads, and messaging statistics in one place.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Security Notice -->
+    <div class="card security-notice">
+      <div class="card-header">
+        <h2>🛡️ Security Disclaimer</h2>
+      </div>
+      <div class="card-body">
+        <h3>Important Security Considerations</h3>
+        
+        <div class="security-points">
+          <div class="security-point">
+            <h4>🚫 RC4 Vulnerabilities</h4>
+            <p>
+              RC4 has known biases in its keystream and is vulnerable to related-key attacks.
+              It was officially prohibited for TLS in 2015 (RFC 7465).
+            </p>
+          </div>
+          
+          <div class="security-point">
+            <h4>🚫 A5/1 Vulnerabilities</h4>
+            <p>
+              A5/1 can be broken with moderate computational resources and is no longer considered
+              secure for protecting mobile communications.
+            </p>
+          </div>
+          
+          <div class="security-point">
+            <h4>✅ Modern Alternatives</h4>
+            <p>
+              For production systems, use modern authenticated encryption like AES-256-GCM,
+              ChaCha20-Poly1305, or established protocols like TLS 1.3 and Signal Protocol.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Call to Action -->
+    <div class="cta-section">
+      <h2>Ready to Explore?</h2>
+      <p>Learn how stream ciphers work and experience cryptography in action</p>
+      <div class="cta-buttons">
+        <a routerLink="/how-it-works" class="btn btn-primary">
+          📖 Learn How It Works
+        </a>
+        <a routerLink="/register" class="btn btn-accent">
+          🚀 Get Started
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

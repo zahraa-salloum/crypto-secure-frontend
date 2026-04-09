@@ -1,0 +1,146 @@
+<nav class="navbar">
+  <div class="container navbar-container">
+    <!-- Logo/Brand -->
+    <div class="navbar-brand">
+      <a routerLink="/" class="brand-link">
+        <span class="brand-icon">🔐</span>
+        <span class="brand-name">CryptoSecure</span>
+      </a>
+    </div>
+    
+    <!-- Navigation Links (desktop) -->
+    <div class="navbar-links">
+      @if (authService.isLoggedIn()) {
+        <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📊</span>Dashboard
+        </a>
+        <a routerLink="/encryption" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">🔒</span>Encrypt/Decrypt
+        </a>
+        <a routerLink="/chat" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">💬</span>Chat
+        </a>
+        <a routerLink="/files" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📁</span>Files
+        </a>
+      } @else {
+        <a routerLink="/home" routerLinkActive="active" class="nav-link">Home</a>
+        <a routerLink="/about" routerLinkActive="active" class="nav-link">About</a>
+        <a routerLink="/how-it-works" routerLinkActive="active" class="nav-link">How It Works</a>
+      }
+    </div>
+    
+    <!-- Right side actions -->
+    <div class="navbar-actions">
+      @if (authService.isLoggedIn()) {
+        @if (isAdminUser()) {
+          <a routerLink="/admin" routerLinkActive="active" class="btn-admin-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            Admin Panel
+          </a>
+        }
+        <div class="user-menu">
+          <button class="btn-icon" (click)="toggleUserMenu()">
+            <span class="user-avatar">
+              @if (authService.currentUser()?.avatar) {
+                <img [src]="authService.currentUser()!.avatar" [alt]="authService.currentUser()!.name" class="avatar-img" />
+              } @else {
+                <span class="avatar-initial">{{ authService.currentUser()?.name?.charAt(0)?.toUpperCase() || 'U' }}</span>
+              }
+            </span>
+          </button>
+          
+          @if (showUserMenu) {
+            <div class="dropdown-menu">
+              <a routerLink="/profile" class="dropdown-item" (click)="showUserMenu = false">
+                <span class="dropdown-icon">👤</span>Profile
+              </a>
+              <hr class="dropdown-divider">
+              <button (click)="logout()" class="dropdown-item">
+                <span class="dropdown-icon">🚪</span>Logout
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <a routerLink="/login" class="btn btn-outline btn-sm">Login</a>
+        <a routerLink="/register" class="btn btn-primary btn-sm">Sign Up</a>
+      }
+      
+      <!-- Hamburger button (mobile only) -->
+      <button class="hamburger-btn" (click)="toggleSidebar()" aria-label="Open menu">
+        <span class="hamburger-icon" [class.open]="showSidebar">
+          <span></span><span></span><span></span>
+        </span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile sidebar overlay -->
+@if (showSidebar) {
+  <div class="sidebar-overlay" (click)="closeSidebar()"></div>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="brand-icon">🔐</span>
+      <span class="sidebar-brand-name">CryptoSecure</span>
+      <button class="sidebar-close-btn" (click)="closeSidebar()">✕</button>
+    </div>
+
+    @if (authService.isLoggedIn()) {
+      <div class="sidebar-user">
+        <span class="sidebar-avatar">
+          @if (authService.currentUser()?.avatar) {
+            <img [src]="authService.currentUser()!.avatar" [alt]="authService.currentUser()!.name" class="avatar-img" />
+          } @else {
+            <span class="avatar-initial">{{ authService.currentUser()?.name?.charAt(0)?.toUpperCase() || 'U' }}</span>
+          }
+        </span>
+        <span class="sidebar-username">{{ authService.currentUser()?.name }}</span>
+      </div>
+    }
+
+    <nav class="sidebar-nav">
+      @if (authService.isLoggedIn()) {
+        <a routerLink="/dashboard" routerLinkActive="active" class="sidebar-link" (click)="closeSidebar()">
+          <span class="nav-icon">📊</span>Dashboard
+        </a>
+        <a routerLink="/encryption" routerLinkActive="active" class="sidebar-link" (click)="closeSidebar()">
+          <span class="nav-icon">🔒</span>Encrypt/Decrypt
+        </a>
+        <a routerLink="/chat" routerLinkActive="active" class="sidebar-link" (click)="closeSidebar()">
+          <span class="nav-icon">💬</span>Chat
+        </a>
+        <a routerLink="/files" routerLinkActive="active" class="sidebar-link" (click)="closeSidebar()">
+          <span class="nav-icon">📁</span>Files
+        </a>
+        <hr class="sidebar-divider">
+        <a routerLink="/profile" routerLinkActive="active" class="sidebar-link" (click)="closeSidebar()">
+          <span class="nav-icon">👤</span>Profile
+        </a>
+        <button class="sidebar-link sidebar-logout" (click)="logout()">
+          <span class="nav-icon">🚪</span>Logout
+        </button>
+      } @else {
+        <a routerLink="/home" routerLinkActive="active" class="sidebar-link" (click)="closeSidebar()">
+          <span class="nav-icon">🏠</span>Home
+        </a>
+        <a routerLink="/about" routerLinkActive="active" class="sidebar-link" (click)="closeSidebar()">
+          <span class="nav-icon">ℹ️</span>About
+        </a>
+        <a routerLink="/how-it-works" routerLinkActive="active" class="sidebar-link" (click)="closeSidebar()">
+          <span class="nav-icon">⚙️</span>How It Works
+        </a>
+        <hr class="sidebar-divider">
+        <a routerLink="/login" class="sidebar-link" (click)="closeSidebar()">
+          <span class="nav-icon">🔑</span>Login
+        </a>
+        <a routerLink="/register" class="sidebar-link" (click)="closeSidebar()">
+          <span class="nav-icon">✍️</span>Sign Up
+        </a>
+      }
+    </nav>
+  </aside>
+}

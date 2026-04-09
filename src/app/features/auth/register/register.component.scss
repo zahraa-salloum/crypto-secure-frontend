@@ -1,0 +1,121 @@
+.auth-container {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 450px;
+  padding: var(--spacing-lg);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.auth-icon {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.auth-header h2 {
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.auth-header p {
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.btn-block {
+  width: 100%;
+  margin-bottom: var(--spacing-sm);
+}
+
+.divider {
+  position: relative;
+  text-align: center;
+  margin: var(--spacing-md) 0;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background-color: var(--color-border);
+}
+
+.divider::before {
+  left: 0;
+}
+
+.divider::after {
+  right: 0;
+}
+
+.divider span {
+  background-color: var(--color-white);
+  padding: 0 var(--spacing-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+}
+
+.google-icon {
+  font-size: var(--font-size-lg);
+}
+
+.auth-links {
+  text-align: center;
+  margin-top: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.auth-links a {
+  color: var(--color-accent);
+  text-decoration: none;
+  margin-left: 4px;
+}
+
+.auth-links a:hover {
+  text-decoration: underline;
+}
+
+.security-notice {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  max-width: 450px;
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm);
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.notice-icon {
+  font-size: var(--font-size-xl);
+}
+
+.security-notice p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}

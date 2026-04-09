@@ -1,0 +1,155 @@
+<app-navbar></app-navbar>
+
+<div class="auth-container">
+  <div class="auth-card card">
+    <div class="card-body">
+      <div class="auth-header">
+        <div class="auth-icon">🔐</div>
+        <h2>Create Account</h2>
+        <p>Join us to start encrypting your data</p>
+      </div>
+      
+      @if (errorMessage()) {
+        <div class="alert alert-danger">
+          {{ errorMessage() }}
+        </div>
+      }
+      
+      @if (successMessage()) {
+        <div class="alert alert-success">
+          {{ successMessage() }}
+        </div>
+      }
+      
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <!-- Name Field -->
+        <div class="form-group">
+          <label for="name" class="form-label">Full Name</label>
+          <input
+            type="text"
+            id="name"
+            formControlName="name"
+            class="form-control"
+            [class.is-invalid]="submitted && f['name'].errors"
+            placeholder="John Doe"
+          >
+          @if (submitted && f['name'].errors) {
+            <div class="invalid-feedback">
+              @if (f['name'].errors['required']) {
+                Name is required
+              }
+              @if (f['name'].errors['minlength']) {
+                Name must be at least 3 characters
+              }
+            </div>
+          }
+        </div>
+        
+        <!-- Email Field -->
+        <div class="form-group">
+          <label for="email" class="form-label">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            class="form-control"
+            [class.is-invalid]="submitted && f['email'].errors"
+            placeholder="your.email@example.com"
+          >
+          @if (submitted && f['email'].errors) {
+            <div class="invalid-feedback">
+              @if (f['email'].errors['required']) {
+                Email is required
+              }
+              @if (f['email'].errors['email']) {
+                Please enter a valid email address
+              }
+            </div>
+          }
+        </div>
+        
+        <!-- Password Field -->
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            class="form-control"
+            [class.is-invalid]="submitted && f['password'].errors"
+            placeholder="Enter a strong password"
+          >
+          @if (submitted && f['password'].errors) {
+            <div class="invalid-feedback">
+              @if (f['password'].errors['required']) { Password is required }
+              @if (f['password'].errors['minlength']) { Password must be at least 8 characters }
+              @if (f['password'].errors['noUppercase']) { Must contain at least one uppercase letter }
+              @if (f['password'].errors['noNumber']) { Must contain at least one number }
+              @if (f['password'].errors['noSpecial']) { Must contain at least one special character (!&#64;#$%…) }
+            </div>
+          }
+          <small class="form-text">Min 8 chars, 1 uppercase, 1 number, 1 special character</small>
+        </div>
+        
+        <!-- Confirm Password Field -->
+        <div class="form-group">
+          <label for="password_confirmation" class="form-label">Confirm Password</label>
+          <input
+            type="password"
+            id="password_confirmation"
+            formControlName="password_confirmation"
+            class="form-control"
+            [class.is-invalid]="submitted && f['password_confirmation'].errors"
+            placeholder="Confirm your password"
+          >
+          @if (submitted && (f['password_confirmation'].errors || registerForm.errors?.['passwordMismatch'])) {
+            <div class="invalid-feedback">
+              @if (f['password_confirmation'].errors?.['required']) { Please confirm your password }
+              @if (registerForm.errors?.['passwordMismatch']) { Passwords do not match }
+            </div>
+          }
+        </div>
+        
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="btn btn-primary btn-block"
+          [disabled]="loading()"
+        >
+          @if (loading()) {
+            <span class="spin">⏳</span> Creating account...
+          } @else {
+            Create Account
+          }
+        </button>
+        
+        <!-- Google OAuth -->
+        <div class="divider">
+          <span>OR</span>
+        </div>
+        
+        <button
+          type="button"
+          (click)="loginWithGoogle()"
+          class="btn btn-outline btn-block google-btn"
+          [disabled]="loading()"
+        >
+          <span class="google-icon">🔐</span>
+          Continue with Google
+        </button>
+      </form>
+      
+      <!-- Links -->
+      <div class="auth-links">
+        Already have an account?
+        <a routerLink="/login">Sign in</a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Educational Notice -->
+  <div class="security-notice">
+    <span class="notice-icon">⚠️</span>
+    <p>Educational project. Do not use real sensitive personal information.</p>
+  </div>
+</div>

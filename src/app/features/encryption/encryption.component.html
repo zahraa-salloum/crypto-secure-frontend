@@ -1,0 +1,250 @@
+<app-navbar></app-navbar>
+
+<div class="encryption-container">
+  <div class="container">
+    <!-- Header -->
+    <div class="page-header">
+      <h1>🔐 Encrypt & Decrypt</h1>
+      <p>Secure your messages using stream cipher algorithms</p>
+    </div>
+    
+    <!-- Mode Tabs -->
+    <div class="mode-tabs">
+      <button
+        class="tab-btn"
+        [class.active]="mode() === 'encrypt'"
+        (click)="switchMode('encrypt')"
+      >
+        🔒 Encrypt
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="mode() === 'decrypt'"
+        (click)="switchMode('decrypt')"
+      >
+        🔓 Decrypt
+      </button>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="encryption-grid">
+      <!-- Input Form -->
+      <div class="card">
+        <div class="card-header">
+          <h3>{{ mode() === 'encrypt' ? 'Plaintext Input' : 'Ciphertext Input' }}</h3>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="encryptionForm">
+            <!-- Text Input -->
+            <div class="form-group">
+              <label class="form-label">
+                {{ mode() === 'encrypt' ? 'Text to Encrypt' : 'Text to Decrypt' }}
+              </label>
+              <textarea
+                formControlName="text"
+                class="form-control"
+                rows="6"
+                [placeholder]="mode() === 'encrypt' ? 'Enter your message here...' : 'Paste encrypted message...'"
+              ></textarea>
+              @if (encryptionForm.get('text')?.invalid && encryptionForm.get('text')?.touched) {
+                <div class="invalid-feedback d-block">
+                  Text is required
+                </div>
+              }
+            </div>
+            
+            <!-- Algorithm Selection -->
+            <div class="form-group">
+              <label class="form-label">Encryption Algorithm</label>
+              <div class="algorithm-options">
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    formControlName="algorithm"
+                    [value]="EncryptionAlgorithm.RC4"
+                  >
+                  <span class="radio-label">
+                    <strong>RC4</strong>
+                    <small>Variable key size (40-2048 bits)</small>
+                  </span>
+                </label>
+                
+                <label class="radio-option">
+                  <input
+                    type="radio"
+                    formControlName="algorithm"
+                    [value]="EncryptionAlgorithm.A5_1"
+                  >
+                  <span class="radio-label">
+                    <strong>A5/1</strong>
+                    <small>64-bit key (GSM cipher)</small>
+                  </span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Encryption Key -->
+            <div class="form-group">
+              <label class="form-label">
+                Encryption Key
+                @if (encryptionForm.value.algorithm === EncryptionAlgorithm.A5_1) {
+                  <span class="key-hint">(16 hex characters required)</span>
+                }
+              </label>
+              <input
+                type="text"
+                formControlName="key"
+                class="form-control"
+                placeholder="Enter encryption key..."
+              >
+              <div class="key-actions">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  (click)="copyKey()"
+                  [disabled]="!encryptionForm.value.key"
+                  title="Copy key to clipboard"
+                >
+                  📋
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  (click)="generateKey()"
+                >
+                  🎲 Generate
+                </button>
+              </div>
+              @if (encryptionForm.get('key')?.invalid && encryptionForm.get('key')?.touched) {
+                <div class="invalid-feedback d-block">
+                  @if (encryptionForm.value.algorithm === EncryptionAlgorithm.A5_1) {
+                    A5/1 requires exactly 16 hex characters
+                  } @else {
+                    Key must be between 5 and 256 characters
+                  }
+                </div>
+              }
+            </div>
+            
+            <!-- Action Button -->
+            <button
+              type="button"
+              class="btn btn-primary btn-block"
+              (click)="processText()"
+              [disabled]="loading() || encryptionForm.invalid"
+            >
+              @if (loading()) {
+                <span class="spin">⏳</span> Processing...
+              } @else {
+                {{ mode() === 'encrypt' ? '🔒 Encrypt' : '🔓 Decrypt' }}
+              }
+            </button>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Output Display -->
+      <div class="card">
+        <div class="card-header">
+          <h3>{{ mode() === 'encrypt' ? 'Encrypted Output' : 'Decrypted Output' }}</h3>
+          @if (result()) {
+            <button
+              class="btn btn-sm btn-outline"
+              (click)="copyToClipboard()"
+            >
+              📋 Copy
+            </button>
+          }
+        </div>
+        <div class="card-body">
+          @if (error()) {
+            <div class="alert alert-danger">
+              {{ error() }}
+            </div>
+          }
+          
+          @if (result()) {
+            <div class="result-display">
+              <div class="result-text">
+                {{ result() }}
+              </div>
+              
+              <div class="result-meta">
+                <div class="meta-item">
+                  <span class="meta-label">Algorithm:</span>
+                  <span class="badge badge-primary">{{ resultAlgorithm() }}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Status:</span>
+                  <span class="encryption-indicator encrypted">
+                    @if (mode() === 'encrypt') {
+                      🔒 Encrypted
+                    } @else {
+                      🔓 Decrypted
+                    }
+                  </span>
+                </div>
+              </div>
+            </div>
+          } @else {
+            <div class="empty-result">
+              <div class="empty-icon">
+                {{ mode() === 'encrypt' ? '🔒' : '🔓' }}
+              </div>
+              <p>Your {{ mode() === 'encrypt' ? 'encrypted' : 'decrypted' }} text will appear here</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+    
+    <!-- Security Warning -->
+    <div class="alert alert-warning security-warning">
+      <div class="warning-header">
+        <span class="warning-icon">⚠️</span>
+        <strong>Educational Purpose Only</strong>
+      </div>
+      <p>
+        RC4 and A5/1 are deprecated cryptographic algorithms with known vulnerabilities.
+        They are implemented here for educational demonstration only.
+        <strong>Do not use for protecting sensitive real-world data.</strong>
+      </p>
+    </div>
+    
+    <!-- Security Notice -->
+    <div class="alert alert-info security-notice">
+      <div class="notice-header">
+        <span class="notice-icon">🔒</span>
+        <strong>Client-Side Encryption</strong>
+      </div>
+      <p>
+        <strong>✓ Your encryption key NEVER leaves your browser!</strong><br>
+        All encryption and decryption happens locally on your device.
+        The key is never sent to the server, ensuring maximum privacy.
+      </p>
+    </div>
+    
+    <!-- Algorithm Information -->
+    <div class="info-grid">
+      <div class="info-card card">
+        <h4>🔐 RC4 Stream Cipher</h4>
+        <ul>
+          <li>Developed by Ron Rivest in 1987</li>
+          <li>Variable key size (40-2048 bits)</li>
+          <li>Used in SSL/TLS and WEP</li>
+          <li><strong>Known vulnerabilities:</strong> Biased keystream, related-key attacks</li>
+        </ul>
+      </div>
+      
+      <div class="info-card card">
+        <h4>📡 A5/1 Stream Cipher</h4>
+        <ul>
+          <li>Used in GSM mobile encryption</li>
+          <li>64-bit key, LFSR-based design</li>
+          <li>Three shift registers (19, 22, 23 bits)</li>
+          <li><strong>Known vulnerabilities:</strong> Can be broken with moderate resources</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

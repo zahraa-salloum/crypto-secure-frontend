@@ -1,0 +1,127 @@
+<app-navbar></app-navbar>
+
+<div class="home-container">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="security-badge">
+          <span class="badge-icon">🔐</span>
+          <span>Educational Cryptography Project</span>
+        </div>
+        
+        <h1 class="hero-title">
+          Secure Communication with
+          <span class="gradient-text">Stream Ciphers</span>
+        </h1>
+        
+        <p class="hero-description">
+          Explore the world of cryptography with our educational platform implementing 
+          RC4 and A5/1 stream ciphers. Encrypt messages, secure files, and chat securely.
+        </p>
+        
+        <div class="hero-actions">
+          <a routerLink="/register" class="btn btn-primary btn-lg">
+            Get Started
+          </a>
+          <a routerLink="/how-it-works" class="btn btn-outline btn-lg">
+            Learn More
+          </a>
+        </div>
+        
+        <div class="security-warning">
+          <span class="warning-icon">⚠️</span>
+          <span>Educational purposes only. RC4 and A5/1 are deprecated algorithms.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Features Section -->
+  <section class="features">
+    <div class="container">
+      <h2 class="section-title">Features</h2>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>Text Encryption</h3>
+          <p>Encrypt and decrypt text using RC4 or A5/1 stream ciphers with custom keys.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📁</div>
+          <h3>File Security</h3>
+          <p>Upload, encrypt, and securely store files with stream cipher encryption.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">💬</div>
+          <h3>Encrypted Chat</h3>
+          <p>Real-time encrypted messaging with end-to-end stream cipher protection.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🔑</div>
+          <h3>Key Management</h3>
+          <p>Generate secure keys and manage encryption parameters for all operations.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Dashboard</h3>
+          <p>Track your encryption activities, file storage, and chat statistics.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">🎓</div>
+          <h3>Educational</h3>
+          <p>Learn about stream ciphers, cryptography, and security best practices.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Algorithms Section -->
+  <section class="algorithms">
+    <div class="container">
+      <h2 class="section-title">Supported Algorithms</h2>
+      
+      <div class="algorithm-cards">
+        <div class="algorithm-card">
+          <div class="algorithm-header">
+            <h3>RC4</h3>
+            <span class="badge badge-warning">Deprecated</span>
+          </div>
+          <p>
+            Variable key-size stream cipher developed by Ron Rivest in 1987. 
+            Used in SSL/TLS and WEP. Educational implementation only.
+          </p>
+          <ul class="algorithm-features">
+            <li>✓ Variable key size (40-2048 bits)</li>
+            <li>✓ Fast encryption/decryption</li>
+            <li>✗ Known biased keystream</li>
+            <li>✗ Vulnerable to related-key attacks</li>
+          </ul>
+        </div>
+        
+        <div class="algorithm-card">
+          <div class="algorithm-header">
+            <h3>A5/1</h3>
+            <span class="badge badge-warning">Deprecated</span>
+          </div>
+          <p>
+            Stream cipher used in GSM mobile phone encryption. 
+            Based on three linear feedback shift registers (LFSRs).
+          </p>
+          <ul class="algorithm-features">
+            <li>✓ 64-bit key size</li>
+            <li>✓ Historical GSM encryption</li>
+            <li>✗ Practical cryptanalysis exists</li>
+            <li>✗ Not recommended for use</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

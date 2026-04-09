@@ -1,0 +1,237 @@
+.encryption-container {
+  min-height: calc(100vh - 64px);
+  padding: var(--spacing-lg) 0;
+  background-color: var(--color-bg-secondary);
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.page-header h1 {
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.page-header p {
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Mode Tabs */
+.mode-tabs {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.tab-btn {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 2px solid var(--color-border);
+  background-color: var(--color-white);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.tab-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.tab-btn.active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+/* Main Grid */
+.encryption-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Algorithm Options */
+.algorithm-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.radio-option {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.radio-option:hover {
+  border-color: var(--color-accent);
+  background-color: var(--color-bg-tertiary);
+}
+
+.radio-option input[type="radio"] {
+  margin-top: 4px;
+}
+
+.radio-option input[type="radio"]:checked + .radio-label {
+  color: var(--color-primary);
+}
+
+.radio-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.radio-label small {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+/* Key Input */
+.key-input-group {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.key-input-group .form-control {
+  flex: 1;
+}
+
+.key-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-xs);
+}
+
+.key-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: normal;
+}
+
+/* Result Display */
+.result-display {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.result-text {
+  padding: var(--spacing-md);
+  background-color: var(--color-bg-tertiary);
+  border-radius: var(--radius-md);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  word-break: break-all;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.result-meta {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.meta-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.empty-result {
+  text-align: center;
+  padding: var(--spacing-xl);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-sm);
+  opacity: 0.5;
+}
+
+.empty-result p {
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Security Warning */
+.security-warning {
+  margin-bottom: var(--spacing-lg);
+}
+
+.warning-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.warning-icon {
+  font-size: var(--font-size-xl);
+}
+
+.security-warning p {
+  margin: 0;
+}
+
+/* Info Grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.info-card {
+  padding: var(--spacing-md);
+}
+
+.info-card h4 {
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.info-card ul {
+  margin: 0;
+  padding-left: var(--spacing-md);
+}
+
+.info-card li {
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .encryption-grid,
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mode-tabs {
+    width: 100%;
+  }
+
+  .tab-btn {
+    flex: 1;
+  }
+}
