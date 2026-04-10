@@ -108,9 +108,10 @@ export class AuthService {
   /**
    * Reset password with token
    */
-  resetPassword(token: string, password: string, passwordConfirmation: string): Observable<any> {
+  resetPassword(token: string, email: string, password: string, passwordConfirmation: string): Observable<any> {
     return this.http.post(`${this.API_URL}/reset-password`, {
       token,
+      email,
       password,
       password_confirmation: passwordConfirmation
     });

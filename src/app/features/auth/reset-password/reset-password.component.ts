@@ -9,6 +9,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+import { passwordStrengthValidator, passwordMatchValidator } from '../../../shared/validators/password.validators';
 
 @Component({
   selector: 'app-reset-password',
@@ -29,20 +30,21 @@ export class ResetPasswordComponent implements OnInit {
   errorMessage = signal('');
   successMessage = signal('');
   token = '';
+  email = '';
   
   constructor() {
     this.resetPasswordForm = this.fb.group({
-      password: ['', [Validators.required, Validators.minLength(8)]],
+      password: ['', [Validators.required, Validators.minLength(8), passwordStrengthValidator]],
       password_confirmation: ['', Validators.required]
-    }, { validators: this.passwordMatchValidator });
+    }, { validators: passwordMatchValidator });
   }
   
   ngOnInit(): void {
-    // Get token from URL query params
     this.route.queryParams.subscribe(params => {
       this.token = params['token'] || '';
-      if (!this.token) {
-        this.errorMessage.set('Invalid or missing reset token');
+      this.email = params['email'] || '';
+      if (!this.token || !this.email) {
+        this.errorMessage.set('Invalid or missing reset link. Please request a new one.');
       }
     });
   }
@@ -62,7 +64,7 @@ export class ResetPasswordComponent implements OnInit {
     this.errorMessage.set('');
     this.successMessage.set('');
     
-    if (this.resetPasswordForm.invalid || !this.token) {
+    if (this.resetPasswordForm.invalid || !this.token || !this.email) {
       return;
     }
     
@@ -70,7 +72,7 @@ export class ResetPasswordComponent implements OnInit {
     
     const { password, password_confirmation } = this.resetPasswordForm.value;
     
-    this.authService.resetPassword(this.token, password, password_confirmation).subscribe({
+    this.authService.resetPassword(this.token, this.email, password, password_confirmation).subscribe({
       next: (response) => {
         this.loading.set(false);
         this.successMessage.set('Password reset successfully! Redirecting to login...');
