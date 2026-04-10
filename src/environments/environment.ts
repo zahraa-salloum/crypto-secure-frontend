@@ -7,17 +7,6 @@
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:8000/api',
-  wsUrl: 'ws://localhost:6379',
-  
-  // Google OAuth (replace with actual credentials)
-  googleClientId: 'YOUR_GOOGLE_CLIENT_ID',
-  
-  // Feature flags
-  features: {
-    googleOAuth: true,
-    fileSharing: true,
-    chat: true,
-  },
   
   // Limits
   maxFileSize: 10 * 1024 * 1024, // 10MB

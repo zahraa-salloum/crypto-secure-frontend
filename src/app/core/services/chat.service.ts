@@ -1,21 +1,16 @@
 /**
  * Chat Service
- * Handles real-time encrypted chat functionality
- * Implements WebSocket communication for live messaging
+ * Handles encrypted chat functionality
  * CLIENT-SIDE ENCRYPTION: All messages encrypted/decrypted on client
  */
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, Subject } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { io, Socket } from 'socket.io-client';
 import { environment } from '../../../environments/environment';
 import {
-  ChatMessage,
   Conversation,
-  SendMessageRequest,
-  SendMessageResponse
 } from '../../models/chat.models';
 import { RC4Crypto } from '../crypto/rc4.crypto';
 import { A51Crypto } from '../crypto/a51.crypto';
@@ -25,58 +20,11 @@ import { A51Crypto } from '../crypto/a51.crypto';
 })
 export class ChatService {
   private readonly API_URL = `${environment.apiUrl}/chat`;
-  private socket: Socket | null = null;
-  
-  // Observables for real-time updates
-  private messagesSubject = new Subject<ChatMessage>();
-  public messages$ = this.messagesSubject.asObservable();
   
   private conversationsSubject = new BehaviorSubject<Conversation[]>([]);
   public conversations$ = this.conversationsSubject.asObservable();
   
-  private typingSubject = new Subject<{ userId: number; isTyping: boolean }>();
-  public typing$ = this.typingSubject.asObservable();
-  
   constructor(private http: HttpClient) {}
-  
-  /**
-   * Initialize WebSocket connection for real-time chat
-   */
-  connect(token: string): void {
-    if (this.socket?.connected) {
-      return;
-    }
-    
-    this.socket = io(environment.wsUrl, {
-      auth: { token },
-      transports: ['websocket']
-    });
-    
-    // Listen for incoming messages
-    this.socket.on('message', (message: ChatMessage) => {
-      this.messagesSubject.next(message);
-    });
-    
-    // Listen for typing indicators
-    this.socket.on('typing', (data: { userId: number; isTyping: boolean }) => {
-      this.typingSubject.next(data);
-    });
-    
-    // Handle connection errors
-    this.socket.on('error', (error: any) => {
-      console.error('Socket error:', error);
-    });
-  }
-  
-  /**
-   * Disconnect from WebSocket
-   */
-  disconnect(): void {
-    if (this.socket) {
-      this.socket.disconnect();
-      this.socket = null;
-    }
-  }
   
   /**
    * Get all conversations for current user
@@ -238,17 +186,6 @@ export class ChatService {
    */
   getUnreadCount(): Observable<any> {
     return this.http.get<any>(`${this.API_URL}/unread-count`);
-  }
-  
-  /**
-   * Send typing indicator
-   * @param conversationId ID of conversation
-   * @param isTyping Whether user is typing
-   */
-  sendTypingIndicator(conversationId: number, isTyping: boolean): void {
-    if (this.socket?.connected) {
-      this.socket.emit('typing', { conversationId, isTyping });
-    }
   }
   
   /**

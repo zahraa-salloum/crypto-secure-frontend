@@ -5,15 +5,6 @@
 export const environment = {
   production: true,
   apiUrl: 'https://crypto-secure-backend.onrender.com/api',
-  wsUrl: 'wss://crypto-secure-backend.onrender.com',
-
-  googleClientId: 'YOUR_GOOGLE_CLIENT_ID',
-
-  features: {
-    googleOAuth: true,
-    fileSharing: true,
-    chat: true,
-  },
 
   maxFileSize: 10 * 1024 * 1024, // 10MB
   maxFilesPerUser: 50,
