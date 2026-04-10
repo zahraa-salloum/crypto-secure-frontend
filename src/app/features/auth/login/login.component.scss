@@ -58,48 +58,6 @@
   margin-bottom: var(--spacing-sm);
 }
 
-.divider {
-  position: relative;
-  text-align: center;
-  margin: var(--spacing-md) 0;
-}
-
-.divider::before,
-.divider::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 45%;
-  height: 1px;
-  background-color: var(--color-border);
-}
-
-.divider::before {
-  left: 0;
-}
-
-.divider::after {
-  right: 0;
-}
-
-.divider span {
-  background-color: var(--color-white);
-  padding: 0 var(--spacing-sm);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-.google-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-xs);
-}
-
-.google-icon {
-  font-size: var(--font-size-lg);
-}
-
 .auth-links {
   display: flex;
   align-items: center;

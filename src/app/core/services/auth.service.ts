@@ -62,25 +62,6 @@ export class AuthService {
   }
   
   /**
-   * Login with Google OAuth
-   */
-  loginWithGoogle(): void {
-    // Redirect to backend Google OAuth endpoint
-    window.location.href = `${this.API_URL}/google`;
-  }
-  
-  /**
-   * Handle Google OAuth callback
-   */
-  handleGoogleCallback(token: string, user: User): void {
-    this.handleAuthSuccess({ 
-      success: true, 
-      message: 'Google login successful',
-      data: { token, user }
-    });
-  }
-  
-  /**
    * Logout user and clear session
    */
   logout(): Observable<void> {

@@ -23,7 +23,6 @@ npm start
 ### Build for Production
 
 ```bash
-# Build the application
 npm run build
 
 # Output will be in dist/cryptography-frontend/
@@ -34,13 +33,11 @@ npm run build
 - `npm start` - Start development server
 - `npm run build` - Build for production
 - `npm test` - Run unit tests
-- `npm run watch` - Build and watch for changes
-- `npm run lint` - Run linter
 
 ## 🎨 Design System
 
 ### Color Palette
-The application uses a security-themed color palette:
+Security-themed color palette:
 
 - **Primary**: `#1a237e` (Deep Indigo)
 - **Secondary**: `#00695c` (Teal)
@@ -60,111 +57,102 @@ System font stack with fallback to sans-serif
 ```
 src/
 ├── app/
-│   ├── core/                 # Core functionality
-│   │   ├── guards/          # Route guards
-│   │   ├── interceptors/    # HTTP interceptors
-│   │   └── services/        # Singleton services
-│   ├── features/            # Feature modules
-│   │   ├── auth/           # Authentication
-│   │   ├── dashboard/      # Dashboard
-│   │   ├── chat/           # Chat feature
-│   │   ├── encryption/     # Encryption tools
-│   │   └── files/          # File management
-│   ├── shared/             # Shared components
-│   │   └── components/     # Reusable components
-│   └── models/             # TypeScript interfaces
-├── assets/                  # Static assets
-├── environments/            # Environment configs
-└── styles.scss             # Global styles
+│   ├── core/
+│   │   ├── crypto/          # RC4 and A5/1 client-side implementations
+│   │   ├── guards/          # Auth and admin route guards
+│   │   ├── interceptors/    # HTTP auth & error interceptors
+│   │   └── services/        # Auth, chat, file, encryption services
+│   ├── features/
+│   │   ├── auth/            # Login, register, forgot/reset password
+│   │   ├── admin/           # Admin dashboard (stats, user management)
+│   │   ├── dashboard/       # User dashboard with stats
+│   │   ├── chat/            # Encrypted real-time chat
+│   │   ├── encryption/      # Text encryption/decryption tool
+│   │   ├── files/           # Encrypted file upload & download
+│   │   ├── profile/         # User profile & password management
+│   │   ├── home/            # Landing page
+│   │   ├── about/           # About page
+│   │   └── how-it-works/    # How it works page
+│   ├── shared/
+│   │   ├── components/      # Navbar, toast, dialog
+│   │   └── validators/      # Password strength validators
+│   └── models/              # TypeScript interfaces
+├── environments/            # Dev and production configs
+└── styles.scss              # Global styles
 ```
 
 ## 🔒 Security Features
 
-- JWT authentication with HTTP-only session storage
-- CSRF protection
-- XSS prevention (Angular's built-in sanitization)
-- Route guards for authentication
-- Secure token management
-- Input validation and sanitization
-- Rate limiting on API calls
+- Token-based authentication with Sanctum (stored in memory/sessionStorage)
+- Route guards for authenticated and admin-only routes
+- HTTP interceptors for auth token injection and error handling
+- Password strength validation (uppercase, number, special character)
+- XSS prevention via Angular's built-in sanitization
+- Content Security Policy headers
+- Input validation on all forms
 
-## 🔧 Configuration
+## 📚 Implemented Features
 
-### Environment Variables
+### Authentication
+- ✅ Register with password strength validation
+- ✅ Login with redirect logic (admin → /admin, user → /dashboard)
+- ✅ Forgot password (sends reset email)
+- ✅ Reset password with token + email from URL
+- ✅ Change password from profile
 
-Edit `src/environments/environment.ts`:
+### Admin Panel
+- ✅ Platform statistics (users, files, messages, storage)
+- ✅ User list with search and role filter
+- ✅ Create users (admin or regular)
+- ✅ Ban / unban users
+
+### Dashboard
+- ✅ Stats overview (encrypted chats, files, messages)
+- ✅ Quick action links
+
+### Encrypted Chat
+- ✅ Start conversations with other users
+- ✅ Client-side RC4 / A5/1 message encryption
+- ✅ Per-conversation encryption key
+- ✅ Messages stored encrypted on server
+
+### File Encryption
+- ✅ Client-side file encryption (RC4 or A5/1) before upload
+- ✅ Encrypted file storage on server
+- ✅ Client-side decryption on download
+- ✅ Key never sent to server
+- ✅ Per-user file limit (10 files)
+
+### Text Encryption Tool
+- ✅ Encrypt/decrypt text with RC4 or A5/1
+- ✅ Copy to clipboard
+
+### Profile
+- ✅ Update display name
+- ✅ Upload avatar (stored as base64)
+- ✅ Change password with strength validation
+- ✅ Delete account
+
+## 🔧 Environment Configuration
+
+Edit `src/environments/environment.ts` for development:
 
 ```typescript
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8000/api/v1',
-  wsUrl: 'ws://localhost:6379',
-  googleClientId: 'YOUR_GOOGLE_CLIENT_ID',
-  // ... other configs
+  apiUrl: 'http://localhost:8000/api',
+  maxFileSize: 10 * 1024 * 1024, // 10MB
 };
 ```
 
-### API URL
+For production, `src/environments/environment.production.ts` is used automatically.
 
-The frontend communicates with the Laravel backend. Ensure the `apiUrl` in environment configuration matches your backend URL.
+## 📦 Key Dependencies
 
-## 📚 Features
-
-### Implemented
-- ✅ Authentication (Login, Register, Forgot Password)
-- ✅ JWT token management
-- ✅ Route guards
-- ✅ HTTP interceptors
-- ✅ Security-themed UI design
-- ✅ Responsive navigation
-- ✅ Global styles and design system
-
-### In Progress
-- 🔨 Dashboard
-- 🔨 Encryption/Decryption tools
-- 🔨 Real-time chat
-- 🔨 File management
-- 🔨 Profile management
-
-### Planned
-- 📋 Google OAuth integration
-- 📋 File sharing
-- 📋 Notification system
-
-## 🧪 Testing
-
-```bash
-# Run unit tests
-npm test
-
-# Run tests with coverage
-npm run test:coverage
-
-# Run e2e tests
-npm run e2e
-```
-
-## 📦 Dependencies
-
-### Core
 - Angular 17+
 - RxJS 7.8+
 - TypeScript 5.2+
-
-### Additional
-- socket.io-client (for real-time chat)
-
-## 🐛 Known Issues
-
-- Google OAuth redirect needs backend configuration
-- WebSocket connection requires Redis setup
-- File upload progress tracking needs implementation
-
-## 📖 Documentation
-
-- [Angular Documentation](https://angular.io/docs)
-- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
-- [RxJS Documentation](https://rxjs.dev/)
+- socket.io-client (real-time chat)
 
 ## 👥 Team
 
@@ -175,7 +163,7 @@ npm run e2e
 
 ## ⚠️ Security Notice
 
-This is an educational project implementing deprecated cryptographic algorithms (RC4 and A5/1). These algorithms have known vulnerabilities and should NOT be used in production systems.
+This is an educational project implementing deprecated cryptographic algorithms (RC4 and A5/1). These algorithms have known vulnerabilities and should **NOT** be used in production systems.
 
 ## 📄 License
 
