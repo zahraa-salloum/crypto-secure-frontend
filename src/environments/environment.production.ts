@@ -6,6 +6,7 @@
 export const environment = {
   production: true,
   apiUrl: 'https://crypto-secure-backend.onrender.com/api',
+  wsUrl: 'wss://crypto-secure-backend.onrender.com',
 
   googleClientId: 'YOUR_GOOGLE_CLIENT_ID',
 
