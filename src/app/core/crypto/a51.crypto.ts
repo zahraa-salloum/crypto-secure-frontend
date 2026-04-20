@@ -54,7 +54,7 @@ export class A51Crypto {
   /**
    * Generate A5/1 keystream
    */
-  private static generateKeystream(key: string, length: number): Uint8Array {
+  static generateKeystream(key: string, length: number): Uint8Array {
     // Initialize LFSRs with key
     const { lfsr1, lfsr2, lfsr3 } = this.initializeLFSRs(key);
     

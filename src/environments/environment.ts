@@ -11,8 +11,9 @@ export const environment = {
   // Limits
   maxFileSize: 10 * 1024 * 1024, // 10MB
   maxFilesPerUser: 50,
-  
+
   // Security settings
   tokenRefreshInterval: 15 * 60 * 1000, // 15 minutes
   sessionTimeout: 60 * 60 * 1000, // 1 hour
+  
 };

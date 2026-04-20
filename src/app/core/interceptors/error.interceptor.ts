@@ -20,7 +20,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       switch (error.status) {
         case 401:
           // Unauthorized - clear session and redirect to login
-          authService.logout();
+          // Use clearSession() directly to avoid subscribing to the logout Observable here
+          authService.clearSession();
           router.navigate(['/login'], {
             queryParams: { expired: 'true' }
           });

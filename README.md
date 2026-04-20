@@ -83,7 +83,9 @@ src/
 
 ## 🔒 Security Features
 
-- Token-based authentication with Sanctum (stored in memory/sessionStorage)
+- Token-based authentication with Sanctum (stored in sessionStorage)
+- Automatic token refresh every 15 minutes via `POST /auth/refresh`
+- Session timeout: forced logout after 1 hour of user inactivity
 - Route guards for authenticated and admin-only routes
 - HTTP interceptors for auth token injection and error handling
 - Password strength validation (uppercase, number, special character)
@@ -113,6 +115,7 @@ src/
 ### Encrypted Chat
 - ✅ Start conversations with other users
 - ✅ Client-side RC4 / A5/1 message encryption
+- ✅ Per-message nonce combined with key to prevent keystream reuse
 - ✅ Per-conversation encryption key
 - ✅ Messages stored encrypted on server
 
@@ -142,6 +145,8 @@ export const environment = {
   production: false,
   apiUrl: 'http://localhost:8000/api',
   maxFileSize: 10 * 1024 * 1024, // 10MB
+  tokenRefreshInterval: 15 * 60 * 1000, // 15 minutes
+  sessionTimeout: 60 * 60 * 1000, // 1 hour
 };
 ```
 

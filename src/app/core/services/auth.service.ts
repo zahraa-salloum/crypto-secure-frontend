@@ -4,21 +4,26 @@
  * Implements secure authentication practices
  */
 
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, NgZone, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, BehaviorSubject, tap, catchError, throwError } from 'rxjs';
+import { Observable, BehaviorSubject, tap, catchError, throwError, fromEvent, merge, Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { User, LoginCredentials, RegisterData, AuthResponse } from '../../models/auth.models';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService {
+export class AuthService implements OnDestroy {
   private readonly API_URL = `${environment.apiUrl}/auth`;
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'auth_user';
   private readonly AVATAR_KEY = 'user_avatar';
+
+  // Timer handles for token refresh and session timeout
+  private tokenRefreshTimer: ReturnType<typeof setTimeout> | null = null;
+  private sessionTimeoutTimer: ReturnType<typeof setTimeout> | null = null;
+  private activitySubscription: Subscription | null = null;
   
   // Observable for authentication state
   private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
@@ -35,10 +40,15 @@ export class AuthService {
   
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private ngZone: NgZone
   ) {
     // Validate token on service initialization
     this.validateStoredToken();
+    // If already authenticated on page reload, restart timers
+    if (this.hasValidToken()) {
+      this.startTimers();
+    }
   }
   
   /**
@@ -192,6 +202,7 @@ export class AuthService {
       } catch { /* ignore storage errors */ }
 
       this.isLoggedIn.set(true);
+      this.startTimers();
     }
   }
   
@@ -283,9 +294,85 @@ export class AuthService {
   }
   
   /**
+   * Start token refresh timer and session timeout after login
+   */
+  private startTimers(): void {
+    this.stopTimers();
+
+    // Run timers outside Angular's change detection to avoid unnecessary CD cycles
+    this.ngZone.runOutsideAngular(() => {
+      // Token refresh: silently get a new token every tokenRefreshInterval
+      this.tokenRefreshTimer = setTimeout(() => {
+        const scheduleRefresh = () => {
+          this.refreshToken().subscribe({
+            next: () => {
+              this.tokenRefreshTimer = setTimeout(scheduleRefresh, environment.tokenRefreshInterval);
+            },
+            error: () => {
+              // If refresh fails (e.g. server-side revocation), force logout
+              this.ngZone.run(() => this.forceLogout());
+            }
+          });
+        };
+        scheduleRefresh();
+      }, environment.tokenRefreshInterval);
+
+      // Session timeout: track user activity events and reset on each one
+      this.resetSessionTimeout();
+      this.activitySubscription = merge(
+        fromEvent(document, 'mousemove'),
+        fromEvent(document, 'keydown'),
+        fromEvent(document, 'click'),
+        fromEvent(document, 'touchstart')
+      ).subscribe(() => this.resetSessionTimeout());
+    });
+  }
+
+  /**
+   * Reset the inactivity session timeout
+   */
+  private resetSessionTimeout(): void {
+    if (this.sessionTimeoutTimer) {
+      clearTimeout(this.sessionTimeoutTimer);
+    }
+    this.sessionTimeoutTimer = setTimeout(() => {
+      this.ngZone.run(() => this.forceLogout('inactive'));
+    }, environment.sessionTimeout);
+  }
+
+  /**
+   * Stop all timers and unsubscribe from activity events
+   */
+  private stopTimers(): void {
+    if (this.tokenRefreshTimer) {
+      clearTimeout(this.tokenRefreshTimer);
+      this.tokenRefreshTimer = null;
+    }
+    if (this.sessionTimeoutTimer) {
+      clearTimeout(this.sessionTimeoutTimer);
+      this.sessionTimeoutTimer = null;
+    }
+    this.activitySubscription?.unsubscribe();
+    this.activitySubscription = null;
+  }
+
+  /**
+   * Force logout with optional reason ('inactive' | 'expired')
+   */
+  private forceLogout(reason: 'inactive' | 'expired' = 'expired'): void {
+    this.clearSession();
+    this.router.navigate(['/login'], { queryParams: { expired: reason } });
+  }
+
+  ngOnDestroy(): void {
+    this.stopTimers();
+  }
+
+  /**
    * Clear authentication session
    */
   clearSession(): void {
+    this.stopTimers();
     sessionStorage.removeItem(this.TOKEN_KEY);
     sessionStorage.removeItem(this.USER_KEY);
     localStorage.removeItem(this.AVATAR_KEY);

@@ -168,21 +168,22 @@ export class FileEncryption {
   }
   
   /**
-   * Encrypt bytes using A5/1 (simplified for file encryption)
+   * Encrypt bytes using A5/1 LFSR-based keystream
    */
   private static encryptBytesA51(bytes: Uint8Array, key: string): Uint8Array {
-    // For simplicity, A5/1 file encryption uses the same approach as RC4
-    // In a real implementation, you'd want to use A5/1's LFSR-based keystream
-    // But for educational purposes and to avoid complexity, we'll use RC4's approach
-    // with A5/1's initialization
-    return this.encryptBytesRC4(bytes, key);
+    const keystream = A51Crypto.generateKeystream(key, bytes.length);
+    const encrypted = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) {
+      encrypted[i] = bytes[i] ^ keystream[i];
+    }
+    return encrypted;
   }
   
   /**
-   * Decrypt bytes using A5/1
+   * Decrypt bytes using A5/1 (same as encrypt due to XOR)
    */
   private static decryptBytesA51(bytes: Uint8Array, key: string): Uint8Array {
-    return this.decryptBytesRC4(bytes, key);
+    return this.encryptBytesA51(bytes, key);
   }
   
   /**

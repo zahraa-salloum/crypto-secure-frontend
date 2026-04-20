@@ -65,7 +65,8 @@ export class ChatService {
               const decryptedContent = this.decryptMessage(
                 msg.encrypted_content,
                 encryptionKey,
-                algorithm
+                algorithm,
+                msg.nonce
               );
               return {
                 ...msg,
@@ -98,8 +99,8 @@ export class ChatService {
     // Generate unique nonce for this message
     const nonce = this.generateNonce();
     
-    // Encrypt the message client-side
-    const encryptedContent = this.encryptMessage(content, encryptionKey, algorithm);
+    // Encrypt the message client-side using nonce-derived key to prevent keystream reuse
+    const encryptedContent = this.encryptMessage(content, encryptionKey, algorithm, nonce);
     
     return this.http.post<any>(`${this.API_URL}/conversations/${conversationId}/messages`, {
       encrypted_content: encryptedContent,
@@ -121,13 +122,15 @@ export class ChatService {
    * @param key Encryption key
    * @param algorithm Algorithm to use (rc4 or a51)
    */
-  private encryptMessage(plaintext: string, key: string, algorithm: string): string {
+  private encryptMessage(plaintext: string, key: string, algorithm: string, nonce: string): string {
     const normalizedAlgorithm = algorithm.toLowerCase();
+    // Derive a per-message key by combining key + nonce to prevent keystream reuse
+    const derivedKey = key + nonce;
     
     if (normalizedAlgorithm === 'rc4') {
-      return RC4Crypto.encrypt(plaintext, key);
+      return RC4Crypto.encrypt(plaintext, derivedKey);
     } else if (normalizedAlgorithm === 'a51' || normalizedAlgorithm === 'a5/1') {
-      return A51Crypto.encrypt(plaintext, key);
+      return A51Crypto.encrypt(plaintext, derivedKey);
     } else {
       throw new Error(`Unsupported encryption algorithm: ${algorithm}`);
     }
@@ -139,13 +142,15 @@ export class ChatService {
    * @param key Decryption key
    * @param algorithm Algorithm to use (rc4 or a51)
    */
-  private decryptMessage(ciphertext: string, key: string, algorithm: string): string {
+  private decryptMessage(ciphertext: string, key: string, algorithm: string, nonce: string): string {
     const normalizedAlgorithm = algorithm.toLowerCase();
+    // Reconstruct the same derived key used during encryption
+    const derivedKey = key + nonce;
     
     if (normalizedAlgorithm === 'rc4') {
-      return RC4Crypto.decrypt(ciphertext, key);
+      return RC4Crypto.decrypt(ciphertext, derivedKey);
     } else if (normalizedAlgorithm === 'a51' || normalizedAlgorithm === 'a5/1') {
-      return A51Crypto.decrypt(ciphertext, key);
+      return A51Crypto.decrypt(ciphertext, derivedKey);
     } else {
       throw new Error(`Unsupported encryption algorithm: ${algorithm}`);
     }
@@ -166,14 +171,6 @@ export class ChatService {
   }
   
   /**
-   * Delete a message
-   * @param messageId ID of message to delete
-   */
-  deleteMessage(messageId: number): Observable<void> {
-    return this.http.delete<void>(`${this.API_URL}/messages/${messageId}`);
-  }
-  
-  /**
    * Mark messages in a conversation as read
    * @param conversationId ID of conversation
    */
@@ -181,20 +178,4 @@ export class ChatService {
     return this.http.post<any>(`${this.API_URL}/conversations/${conversationId}/mark-read`, {});
   }
   
-  /**
-   * Get unread message count
-   */
-  getUnreadCount(): Observable<any> {
-    return this.http.get<any>(`${this.API_URL}/unread-count`);
-  }
-  
-  /**
-   * Search for users to start conversation
-   * @param query Search query
-   */
-  searchUsers(query: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.API_URL}/users/search`, {
-      params: { q: query }
-    });
-  }
 }
