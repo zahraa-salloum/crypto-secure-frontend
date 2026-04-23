@@ -5,7 +5,7 @@
 
 import { Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { EncryptionService } from '../../core/services/encryption.service';
 import { EncryptionAlgorithm } from '../../models/encryption.models';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
@@ -31,6 +31,7 @@ export class EncryptionComponent {
   result = signal('');
   resultAlgorithm = signal('');
   error = signal('');
+  formValid = signal(false);
   
   encryptionForm: FormGroup;
   
@@ -38,16 +39,48 @@ export class EncryptionComponent {
     this.encryptionForm = this.fb.group({
       text: ['', Validators.required],
       algorithm: [EncryptionAlgorithm.RC4, Validators.required],
-      key: ['', Validators.required]
+      key: ['', [Validators.required, this.rc4KeyValidator()]]
     });
 
-    // Clear key when encryption algorithm changes
-    this.encryptionForm.get('algorithm')?.valueChanges.subscribe(() => {
-      this.encryptionForm.patchValue({ key: '' });
-      this.encryptionForm.get('key')?.markAsUntouched();
-      this.encryptionForm.get('key')?.markAsPristine();
+    // Keep formValid signal in sync — valueChanges fires on every keystroke
+    this.encryptionForm.valueChanges.subscribe(() => {
+      this.formValid.set(this.encryptionForm.valid);
+    });
+
+    // Update key validators when algorithm changes
+    this.encryptionForm.get('algorithm')?.valueChanges.subscribe((algo) => {
+      const keyCtrl = this.encryptionForm.get('key')!;
+      keyCtrl.setValidators([Validators.required,
+        algo === EncryptionAlgorithm.A5_1 ? this.a51KeyValidator() : this.rc4KeyValidator()
+      ]);
+      keyCtrl.setValue('');
+      keyCtrl.markAsUntouched();
+      keyCtrl.markAsPristine();
+      keyCtrl.updateValueAndValidity();
+      this.formValid.set(this.encryptionForm.valid);
     });
   }
+
+  /** A5/1: exactly 16 lowercase/uppercase hex characters */
+  private a51KeyValidator(): ValidatorFn {
+    return (ctrl: AbstractControl) => {
+      const v: string = (ctrl.value || '').trim();
+      return /^[0-9a-fA-F]{16}$/.test(v) ? null : { a51KeyFormat: true };
+    };
+  }
+
+  /** RC4: between 5 and 256 characters */
+  private rc4KeyValidator(): ValidatorFn {
+    return (ctrl: AbstractControl) => {
+      const len = (ctrl.value || '').trim().length;
+      if (len < 5)   return { rc4KeyTooShort: true };
+      if (len > 256) return { rc4KeyTooLong: true };
+      return null;
+    };
+  }
+
+  get isA51(): boolean { return this.encryptionForm.value.algorithm === EncryptionAlgorithm.A5_1; }
+  get keyCtrl() { return this.encryptionForm.get('key')!; }
   
   switchMode(newMode: 'encrypt' | 'decrypt'): void {
     if (this.mode() !== newMode) {
@@ -64,8 +97,8 @@ export class EncryptionComponent {
   
   generateKey(): void {
     const algorithm = this.encryptionForm.value.algorithm;
-    const key = algorithm === EncryptionAlgorithm.A5_1 
-      ? A51Crypto.generateKey(16) 
+    const key = algorithm === EncryptionAlgorithm.A5_1
+      ? A51Crypto.generateKey()       // always 8 bytes / 64-bit key as 16-char hex
       : RC4Crypto.generateKey(32);
     this.encryptionForm.patchValue({ key });
   }

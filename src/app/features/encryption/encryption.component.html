@@ -95,6 +95,8 @@
                 type="text"
                 formControlName="key"
                 class="form-control"
+                [class.is-invalid]="keyCtrl.invalid && keyCtrl.touched"
+                [class.is-valid]="keyCtrl.valid && keyCtrl.touched"
                 placeholder="Enter encryption key..."
               >
               <div class="key-actions">
@@ -115,14 +117,21 @@
                   🎲 Generate
                 </button>
               </div>
-              @if (encryptionForm.get('key')?.invalid && encryptionForm.get('key')?.touched) {
+              @if (keyCtrl.invalid && keyCtrl.touched) {
                 <div class="invalid-feedback d-block">
-                  @if (encryptionForm.value.algorithm === EncryptionAlgorithm.A5_1) {
-                    A5/1 requires exactly 16 hex characters
-                  } @else {
-                    Key must be between 5 and 256 characters
-                  }
+                  @if (keyCtrl.errors?.['required']) { Key is required }
+                  @if (keyCtrl.errors?.['a51KeyFormat']) { A5/1 key must be exactly 16 hex characters (0-9, a-f) }
+                  @if (keyCtrl.errors?.['rc4KeyTooShort']) { RC4 key must be at least 5 characters }
+                  @if (keyCtrl.errors?.['rc4KeyTooLong']) { RC4 key must not exceed 256 characters }
                 </div>
+              }
+              @if (keyCtrl.valid && keyCtrl.touched) {
+                <small class="form-text text-success">✓ Valid key</small>
+              } @else if (!keyCtrl.touched) {
+                <small class="form-text">
+                  @if (isA51) { Exactly 16 hex characters (0–9, a–f) }
+                  @else { 5 to 256 characters }
+                </small>
               }
             </div>
             
@@ -131,7 +140,7 @@
               type="button"
               class="btn btn-primary btn-block"
               (click)="processText()"
-              [disabled]="loading() || encryptionForm.invalid"
+              [disabled]="loading() || !formValid()"
             >
               @if (loading()) {
                 <span class="spin">⏳</span> Processing...

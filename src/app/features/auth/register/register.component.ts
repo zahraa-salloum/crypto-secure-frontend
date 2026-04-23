@@ -42,6 +42,12 @@ export class RegisterComponent {
   get f() {
     return this.registerForm.controls;
   }
+
+  // Live password requirement checks
+  get pwHasLength()    { return (this.f['password'].value?.length ?? 0) >= 8; }
+  get pwHasUppercase() { return /[A-Z]/.test(this.f['password'].value || ''); }
+  get pwHasNumber()    { return /[0-9]/.test(this.f['password'].value || ''); }
+  get pwHasSpecial()   { return /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(this.f['password'].value || ''); }
   
   onSubmit(): void {
     this.submitted = true;

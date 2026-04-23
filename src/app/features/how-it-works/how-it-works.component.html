@@ -181,21 +181,84 @@ while generatingOutput:
           <div class="step">
             <div class="step-number">1</div>
             <div class="step-content">
-              <h4>Initialization</h4>
+              <h4>Key Normalization</h4>
               <p>
-                The three LFSRs are initialized with the 64-bit secret key, loading bits
-                sequentially into each register.
+                A5/1 requires exactly 64 bits (8 bytes) as the session key (Kc).
+                All key bytes are XOR-folded into an 8-byte block so that every byte
+                of the input contributes to the full 64-bit key — no material is silently
+                discarded or padded with zeros.
               </p>
+              <div class="code-block">
+                <pre><code>normalizedKey[8] = &#123;0&#125;
+for each byte b in key:
+    normalizedKey[b mod 8] ^= b</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>Initialization — Phase 1: Load 64-bit Session Key</h4>
+              <p>
+                All three LFSRs start at zero. Each of the 64 key bits (LSB-first within
+                each byte) is XORed into bit 0 of every register, then all three registers
+                are clocked unconditionally using their feedback taps.
+              </p>
+              <div class="code-block">
+                <pre><code>for i from 0 to 63:
+    LFSR1[0] ^= keyBit[i]
+    LFSR2[0] ^= keyBit[i]
+    LFSR3[0] ^= keyBit[i]
+    clock LFSR1, LFSR2, LFSR3  // unconditional</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>Initialization — Phase 2: Load 22-bit Frame Number</h4>
+              <p>
+                A 22-bit frame counter (COUNT) is loaded LSB-first using the same
+                XOR-then-clock procedure. This makes every frame produce a unique
+                keystream even when the session key is reused — the core security
+                property of A5/1 in GSM.
+              </p>
+              <div class="code-block">
+                <pre><code>for i from 0 to 21:
+    LFSR1[0] ^= frameBit[i]
+    LFSR2[0] ^= frameBit[i]
+    LFSR3[0] ^= frameBit[i]
+    clock LFSR1, LFSR2, LFSR3  // unconditional</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h4>Initialization — Phase 3: Warm-up (100 cycles)</h4>
+              <p>
+                100 majority-clocked cycles are run and the output is discarded.
+                This mixes the internal state thoroughly before keystream production begins.
+              </p>
+              <div class="code-block">
+                <pre><code>for i from 0 to 99:
+    clockMajority(LFSR1, LFSR2, LFSR3)  // output discarded</code></pre>
+              </div>
             </div>
           </div>
           
           <div class="step">
-            <div class="step-number">2</div>
+            <div class="step-number">5</div>
             <div class="step-content">
               <h4>Majority Clocking</h4>
               <p>
-                Each LFSR has a "clock bit". The majority value of the three clock bits
-                determines which registers are clocked in each round.
+                Each LFSR has a dedicated "clock bit". In each keystream cycle the majority
+                value of the three clock bits is computed; only registers whose clock bit
+                matches the majority are advanced. This irregular clocking is the source of
+                A5/1's non-linearity.
               </p>
               <div class="code-block">
                 <pre><code>majority = (clockBit1 + clockBit2 + clockBit3) >= 2 ? 1 : 0
@@ -208,11 +271,13 @@ if (clockBit3 == majority) clock LFSR-3</code></pre>
           </div>
           
           <div class="step">
-            <div class="step-number">3</div>
+            <div class="step-number">6</div>
             <div class="step-content">
               <h4>Keystream Generation</h4>
               <p>
-                The output bit is the XOR of the most significant bits from all three LFSRs.
+                After clocking, the output bit is the XOR of the highest-index bits of all
+                three registers. In real GSM usage this produces a 114-bit burst per frame
+                (one burst per TDMA frame direction).
               </p>
               <div class="code-block">
                 <pre><code>keystreamBit = LFSR1[18] ⊕ LFSR2[21] ⊕ LFSR3[22]</code></pre>

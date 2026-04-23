@@ -122,8 +122,8 @@ export class FilesComponent implements OnInit {
   generateKey(algorithm?: string): void {
     const algo = algorithm || this.uploadForm.value.algorithm;
     // Use cryptographically secure random key generation
-    const key = algo === 'A5/1' 
-      ? A51Crypto.generateKey(16) 
+    const key = algo === 'A5/1'
+      ? A51Crypto.generateKey()       // always 8 bytes / 64-bit key as 16-char hex
       : RC4Crypto.generateKey(32);
     this.uploadForm.patchValue({ key });
   }

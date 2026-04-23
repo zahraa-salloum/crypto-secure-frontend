@@ -153,19 +153,28 @@
                 class="form-control"
                 placeholder="Enter new password"
               >
-              @if (passwordForm.get('newPassword')?.touched) {
-                @if (passwordForm.get('newPassword')?.errors?.['required']) {
-                  <div class="invalid-feedback d-block">Password is required</div>
-                } @else if (passwordForm.get('newPassword')?.errors?.['minlength']) {
-                  <div class="invalid-feedback d-block">Password must be at least 8 characters</div>
-                } @else if (passwordForm.get('newPassword')?.errors?.['noUppercase']) {
-                  <div class="invalid-feedback d-block">Password must contain at least one uppercase letter</div>
-                } @else if (passwordForm.get('newPassword')?.errors?.['noNumber']) {
-                  <div class="invalid-feedback d-block">Password must contain at least one number</div>
-                } @else if (passwordForm.get('newPassword')?.errors?.['noSpecial']) {
-                  <div class="invalid-feedback d-block">Password must contain at least one special character</div>
-                }
+              @if (passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.errors?.['required']) {
+                <div class="invalid-feedback d-block">Password is required</div>
               }
+              <!-- Live password requirements checklist -->
+              <div class="password-requirements">
+                <div class="req" [class.met]="pwHasLength">
+                  <span class="req-icon">{{ pwHasLength ? '✓' : '✗' }}</span>
+                  At least 8 characters
+                </div>
+                <div class="req" [class.met]="pwHasUppercase">
+                  <span class="req-icon">{{ pwHasUppercase ? '✓' : '✗' }}</span>
+                  At least 1 uppercase letter
+                </div>
+                <div class="req" [class.met]="pwHasNumber">
+                  <span class="req-icon">{{ pwHasNumber ? '✓' : '✗' }}</span>
+                  At least 1 number
+                </div>
+                <div class="req" [class.met]="pwHasSpecial">
+                  <span class="req-icon">{{ pwHasSpecial ? '✓' : '✗' }}</span>
+                  At least 1 special character
+                </div>
+              </div>
             </div>
             
             <div class="form-group">

@@ -88,7 +88,25 @@
               @if (f['password'].errors['noSpecial']) { Must contain at least one special character (!&#64;#$%…) }
             </div>
           }
-          <small class="form-text">Min 8 chars, 1 uppercase, 1 number, 1 special character</small>
+          <!-- Live password requirements checklist -->
+          <div class="password-requirements">
+            <div class="req" [class.met]="pwHasLength">
+              <span class="req-icon">{{ pwHasLength ? '✓' : '✗' }}</span>
+              At least 8 characters
+            </div>
+            <div class="req" [class.met]="pwHasUppercase">
+              <span class="req-icon">{{ pwHasUppercase ? '✓' : '✗' }}</span>
+              At least 1 uppercase letter
+            </div>
+            <div class="req" [class.met]="pwHasNumber">
+              <span class="req-icon">{{ pwHasNumber ? '✓' : '✗' }}</span>
+              At least 1 number
+            </div>
+            <div class="req" [class.met]="pwHasSpecial">
+              <span class="req-icon">{{ pwHasSpecial ? '✓' : '✗' }}</span>
+              At least 1 special character
+            </div>
+          </div>
         </div>
         
         <!-- Confirm Password Field -->
@@ -99,10 +117,10 @@
             id="password_confirmation"
             formControlName="password_confirmation"
             class="form-control"
-            [class.is-invalid]="submitted && f['password_confirmation'].errors"
+            [class.is-invalid]="(submitted || f['password_confirmation'].touched) && (f['password_confirmation'].errors || registerForm.errors?.['passwordMismatch'])"
             placeholder="Confirm your password"
           >
-          @if (submitted && (f['password_confirmation'].errors || registerForm.errors?.['passwordMismatch'])) {
+          @if ((submitted || f['password_confirmation'].touched) && (f['password_confirmation'].errors || registerForm.errors?.['passwordMismatch'])) {
             <div class="invalid-feedback">
               @if (f['password_confirmation'].errors?.['required']) { Please confirm your password }
               @if (registerForm.errors?.['passwordMismatch']) { Passwords do not match }
@@ -114,7 +132,7 @@
         <button
           type="submit"
           class="btn btn-primary btn-block"
-          [disabled]="loading()"
+          [disabled]="loading() || registerForm.invalid"
         >
           @if (loading()) {
             <span class="spin">⏳</span> Creating account...

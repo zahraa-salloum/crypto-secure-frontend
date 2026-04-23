@@ -39,6 +39,39 @@
   margin-bottom: var(--spacing-sm);
 }
 
+.password-requirements {
+  margin-top: var(--spacing-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.req {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  transition: color 200ms ease;
+}
+
+.req.met {
+  color: var(--color-success, #2e7d32);
+}
+
+.req-icon {
+  font-size: 0.75rem;
+  width: 14px;
+  text-align: center;
+  font-weight: bold;
+  color: #c62828;
+  transition: color 200ms ease;
+}
+
+.req.met .req-icon {
+  color: var(--color-success, #2e7d32);
+}
+
 .auth-links {
   text-align: center;
   margin-top: var(--spacing-md);

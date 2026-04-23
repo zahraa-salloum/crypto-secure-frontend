@@ -171,7 +171,8 @@ export class FileEncryption {
    * Encrypt bytes using A5/1 LFSR-based keystream
    */
   private static encryptBytesA51(bytes: Uint8Array, key: string): Uint8Array {
-    const keystream = A51Crypto.generateKeystream(key, bytes.length);
+    // frameNumber=0: file encryption is not GSM-framed; a single frame is correct here
+    const keystream = A51Crypto.generateKeystream(key, bytes.length, 0);
     const encrypted = new Uint8Array(bytes.length);
     for (let i = 0; i < bytes.length; i++) {
       encrypted[i] = bytes[i] ^ keystream[i];

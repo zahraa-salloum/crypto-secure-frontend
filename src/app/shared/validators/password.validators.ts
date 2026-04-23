@@ -22,3 +22,10 @@ export const passwordMatchValidator = (control: AbstractControl): ValidationErro
   const confirm  = control.get('password_confirmation')?.value;
   return password && confirm && password !== confirm ? { passwordMismatch: true } : null;
 };
+
+/** Cross-field validator for change-password form: newPassword and confirmPassword must match. */
+export const changePasswordMatchValidator = (control: AbstractControl): ValidationErrors | null => {
+  const password = control.get('newPassword')?.value;
+  const confirm  = control.get('confirmPassword')?.value;
+  return password && confirm && password !== confirm ? { passwordMismatch: true } : null;
+};

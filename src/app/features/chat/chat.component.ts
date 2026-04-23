@@ -8,6 +8,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ChatService } from '../../core/services/chat.service';
 import { AuthService } from '../../core/services/auth.service';
+import { RC4Crypto } from '../../core/crypto/rc4.crypto';
+import { A51Crypto } from '../../core/crypto/a51.crypto';
 import { EncryptionService } from '../../core/services/encryption.service';
 import { Conversation, Message } from '../../models/chat.models';
 import { EncryptionAlgorithm } from '../../models/encryption.models';
@@ -224,8 +226,10 @@ export class ChatComponent implements OnInit, OnDestroy {
   
   generateConversationKey(algorithm?: string): void {
     const algo = algorithm || this.newConversationForm.value.algorithm;
-    const length = algo === 'A5/1' ? 16 : 32;
-    const key = this.generateRandomKey(length);
+    // Use the cipher's own cryptographically secure key generator
+    const key = algo === 'A5/1'
+      ? A51Crypto.generateKey()      // 8 random bytes as 16-char hex (64-bit Kc)
+      : RC4Crypto.generateKey(32);   // 32 random bytes as 64-char hex
     this.newConversationForm.patchValue({ encryptionKey: key });
   }
   
@@ -240,14 +244,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
   }
   
-  private generateRandomKey(length: number): string {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let key = '';
-    for (let i = 0; i < length; i++) {
-      key += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return key;
-  }
+  // generateRandomKey removed — use A51Crypto.generateKey() or RC4Crypto.generateKey() directly
   
   markAsRead(conversationId: number): void {
     this.chatService.markAsRead(conversationId).subscribe({

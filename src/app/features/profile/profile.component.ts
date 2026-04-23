@@ -13,7 +13,7 @@ import { User } from '../../models/auth.models';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { ToastService } from '../../core/services/toast.service';
 import { DialogService } from '../../core/services/dialog.service';
-import { passwordStrengthValidator, passwordMatchValidator } from '../../shared/validators/password.validators';
+import { passwordStrengthValidator, changePasswordMatchValidator } from '../../shared/validators/password.validators';
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -54,9 +54,15 @@ export class ProfileComponent implements OnInit {
       currentPassword: ['', Validators.required],
       newPassword: ['', [Validators.required, Validators.minLength(8), passwordStrengthValidator]],
       confirmPassword: ['', Validators.required]
-    }, { validators: passwordMatchValidator });
+    }, { validators: changePasswordMatchValidator });
   }
-  
+
+  // Password requirement getters for live checklist
+  get pwHasLength()    { return (this.passwordForm.get('newPassword')?.value?.length ?? 0) >= 8; }
+  get pwHasUppercase() { return /[A-Z]/.test(this.passwordForm.get('newPassword')?.value || ''); }
+  get pwHasNumber()    { return /[0-9]/.test(this.passwordForm.get('newPassword')?.value || ''); }
+  get pwHasSpecial()   { return /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(this.passwordForm.get('newPassword')?.value || ''); }
+
   ngOnInit(): void {
     // Use the reactive signal so avatar updates reflect immediately
     const currentUser = this.authService.currentUser();
