@@ -127,6 +127,119 @@
   --z-tooltip: 1070;
 }
 
+/* === Dark Theme === */
+[data-theme="dark"] {
+  /* Primary - slightly lighter so it's visible on dark bg */
+  --color-primary: #7986cb;
+  --color-primary-light: #aab6fb;
+  --color-primary-dark: #49599a;
+
+  /* Secondary */
+  --color-secondary: #4db6ac;
+  --color-secondary-light: #82e9de;
+  --color-secondary-dark: #00867d;
+
+  /* Accent */
+  --color-accent: #40c4ff;
+  --color-accent-light: #82f7ff;
+  --color-accent-dark: #0094cc;
+
+  /* Status */
+  --color-success: #66bb6a;
+  --color-success-light: #98ee99;
+  --color-success-dark: #338a3e;
+
+  --color-warning: #ffa726;
+  --color-warning-light: #ffd95b;
+  --color-warning-dark: #c77800;
+
+  --color-danger: #ef5350;
+  --color-danger-light: #ff867c;
+  --color-danger-dark: #b61827;
+
+  --color-info: #29b6f6;
+  --color-info-light: #73e8ff;
+  --color-info-dark: #0086c3;
+
+  /* Neutral */
+  --color-dark: #cfd8dc;
+  --color-dark-light: #eceff1;
+  --color-dark-lighter: #b0bec5;
+
+  /* Text */
+  --color-text-primary: #eceff1;
+  --color-text-secondary: #b0bec5;
+  --color-text-disabled: #546e7a;
+  --color-text-hint: #78909c;
+
+  /* Backgrounds */
+  --color-bg-primary: #1a1f2e;
+  --color-bg-secondary: #121620;
+  --color-bg-tertiary: #1e2636;
+  --color-bg-dark: #0d1117;
+
+  /* Borders */
+  --color-border: #2a3347;
+  --color-border-light: #1e2636;
+  --color-border-dark: #374156;
+
+  /* Shadows - more pronounced on dark */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.5), 0 3px 6px rgba(0, 0, 0, 0.35);
+  --shadow-xl: 0 15px 25px rgba(0, 0, 0, 0.5), 0 5px 10px rgba(0, 0, 0, 0.3);
+
+  /* White/black flip */
+  --color-white: #1a1f2e;
+  --color-black: #eceff1;
+
+  color-scheme: dark;
+
+  /* ── Alert overrides (hardcoded bg in light theme) ── */
+  .alert-success {
+    background-color: rgba(46, 125, 50, 0.18);
+    color: #a5d6a7;
+    border-color: var(--color-success);
+  }
+  .alert-warning {
+    background-color: rgba(245, 124, 0, 0.18);
+    color: #ffcc80;
+    border-color: var(--color-warning);
+  }
+  .alert-danger {
+    background-color: rgba(198, 40, 40, 0.18);
+    color: #ef9a9a;
+    border-color: var(--color-danger);
+  }
+  .alert-info {
+    background-color: rgba(2, 119, 189, 0.18);
+    color: #81d4fa;
+    border-color: var(--color-info);
+  }
+
+  /* inherit alert color so global <p> gray doesn't override it */
+  .alert p,
+  .alert strong,
+  .alert a {
+    color: inherit;
+  }
+
+  /* Encryption indicator overrides */
+  .encryption-indicator.encrypted {
+    background-color: rgba(46, 125, 50, 0.2);
+    color: #a5d6a7;
+  }
+  .encryption-indicator.unencrypted {
+    background-color: rgba(198, 40, 40, 0.2);
+    color: #ef9a9a;
+  }
+}
+
+/* Smooth transition when theme changes */
+html {
+  transition: background-color var(--transition-slow), color var(--transition-slow);
+}
+
 /* === Reset & Base Styles === */
 * {
   margin: 0;
@@ -202,6 +315,12 @@ a {
   cursor: pointer;
   transition: all var(--transition-base);
   user-select: none;
+
+  /* Prevent global a:hover from applying underline / accent color to <a> buttons */
+  &:hover {
+    text-decoration: none;
+    color: inherit;
+  }
   
   &:disabled {
     opacity: 0.6;
@@ -221,6 +340,7 @@ a {
   &:hover:not(:disabled) {
     background-color: var(--color-primary-dark);
     box-shadow: var(--shadow-md);
+    color: var(--color-white);
   }
 }
 
@@ -229,6 +349,7 @@ a {
   color: var(--color-white);
   
   &:hover:not(:disabled) {
+    color: var(--color-white);
     background-color: var(--color-secondary-dark);
     box-shadow: var(--shadow-md);
   }
@@ -241,6 +362,7 @@ a {
   &:hover:not(:disabled) {
     background-color: var(--color-accent-dark);
     box-shadow: var(--shadow-md);
+    color: var(--color-white);
   }
 }
 
@@ -251,6 +373,7 @@ a {
   &:hover:not(:disabled) {
     background-color: var(--color-success-dark);
     box-shadow: var(--shadow-md);
+    color: var(--color-white);
   }
 }
 
@@ -261,6 +384,7 @@ a {
   &:hover:not(:disabled) {
     background-color: var(--color-danger-dark);
     box-shadow: var(--shadow-md);
+    color: var(--color-white);
   }
 }
 

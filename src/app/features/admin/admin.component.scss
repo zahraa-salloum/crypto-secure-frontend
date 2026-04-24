@@ -502,3 +502,182 @@
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Dark Mode ──────────────────────────────────────────────────────────────
+:host-context([data-theme="dark"]) {
+
+  .admin-page {
+    background: #121620;
+  }
+
+  .admin-badge {
+    background: rgba(121, 134, 203, 0.15);
+    color: #aab6fb;
+    border-color: rgba(121, 134, 203, 0.3);
+  }
+
+  .admin-title  { color: #eceff1; }
+  .admin-subtitle { color: #b0bec5; }
+
+  // Tab nav
+  .tab-nav {
+    background: #1e2636;
+    box-shadow: 0 1px 4px rgba(0,0,0,.3);
+
+    .tab-btn {
+      color: #b0bec5;
+
+      &:hover { background: #2a3347; color: #eceff1; }
+      &.active { background: #4051b5; color: #fff; }
+    }
+  }
+
+  // Stat cards
+  .stat-card {
+    background: #1e2636;
+    box-shadow: 0 1px 4px rgba(0,0,0,.3);
+
+    &.highlight { border-left-color: #40c4ff; }
+
+    .stat-info {
+      .stat-value { color: #eceff1; }
+      .stat-label { color: #b0bec5; }
+    }
+  }
+
+  // Section card
+  .section-card {
+    background: #1e2636;
+    box-shadow: 0 1px 4px rgba(0,0,0,.3);
+
+    .section-title { color: #eceff1; }
+    .section-desc  { color: #b0bec5; }
+  }
+
+  // Toolbar
+  .section-toolbar {
+    .search-box {
+      background: #121620;
+      color: #b0bec5;
+
+      .search-input {
+        color: #eceff1;
+        &::placeholder { color: #546e7a; }
+      }
+    }
+
+    .filter-select {
+      background: #1e2636;
+      border-color: #2a3347;
+      color: #eceff1;
+
+      &:focus { border-color: #7986cb; }
+    }
+  }
+
+  // Table
+  .users-table {
+    th {
+      background: #121620;
+      color: #78909c;
+      border-bottom-color: #2a3347;
+    }
+
+    td {
+      border-bottom-color: #1e2636;
+      color: #eceff1;
+    }
+
+    tr.row-banned td { background: rgba(198, 40, 40, 0.08); }
+
+    .empty-row { color: #546e7a; }
+  }
+
+  // Badges
+  .badge {
+    &.badge-admin { background: rgba(121, 134, 203, 0.2); color: #aab6fb; }
+    &.badge-user  { background: rgba(77, 182, 172, 0.2);  color: #80cbc4; }
+  }
+
+  // Status dots
+  .status-dot {
+    &.status-active { color: #66bb6a; }
+    &.status-banned { color: #ef5350; }
+    &.status-active::before { background: #66bb6a; }
+    &.status-banned::before { background: #ef5350; }
+  }
+
+  // Ban confirm
+  .ban-confirm {
+    .ban-reason-input {
+      background: #121620;
+      border-color: #2a3347;
+      color: #eceff1;
+
+      &:focus { border-color: #ef5350; }
+    }
+  }
+
+  // Pagination
+  .pagination {
+    .pagination-info { color: #78909c; }
+  }
+
+  // Create form
+  .create-form {
+    .form-group {
+      label { color: #b0bec5; }
+
+      input[type=text],
+      input[type=email],
+      input[type=password] {
+        background: #121620;
+        border-color: #2a3347;
+        color: #eceff1;
+
+        &:focus { border-color: #7986cb; }
+        &::placeholder { color: #546e7a; }
+      }
+    }
+
+    .role-option {
+      .role-card {
+        border-color: #2a3347;
+        background: #1e2636;
+
+        .role-name { color: #eceff1; }
+        .role-desc  { color: #78909c; }
+        svg { color: #78909c; }
+      }
+
+      &.selected .role-card {
+        border-color: #7986cb;
+        background: rgba(121, 134, 203, 0.1);
+
+        svg { color: #7986cb; }
+        .role-name { color: #aab6fb; }
+      }
+    }
+  }
+
+  // Buttons
+  .btn {
+    &.btn-ghost {
+      color: #b0bec5;
+      border-color: #2a3347;
+
+      &:hover:not(:disabled) { background: #2a3347; color: #eceff1; }
+    }
+  }
+
+  // Loading state
+  .loading-state {
+    color: #78909c;
+
+    .spinner {
+      border-color: #2a3347;
+      border-top-color: #7986cb;
+    }
+  }
+}
+

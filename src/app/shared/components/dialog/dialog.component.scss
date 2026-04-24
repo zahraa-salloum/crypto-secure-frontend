@@ -186,3 +186,51 @@
     width: 100%;
   }
 }
+
+/* ── Dark Mode ─────────────────────────────────────────────────────────── */
+:host-context([data-theme="dark"]) {
+  .dialog-container {
+    background: #1e2636;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  }
+
+  .dialog-header {
+    border-bottom-color: #2a3347;
+  }
+
+  .dialog-body p {
+    color: #b0bec5;
+  }
+
+  .dialog-input {
+    background: #121620;
+    border-color: #2a3347;
+    color: #eceff1;
+
+    &::placeholder {
+      color: #546e7a;
+    }
+
+    &:focus {
+      border-color: #7986cb;
+      box-shadow: 0 0 0 3px rgba(121, 134, 203, 0.15);
+    }
+  }
+
+  .dialog-footer {
+    background-color: #121620;
+    border-top-color: #2a3347;
+  }
+
+  .btn-outline {
+    background: #1e2636;
+    color: #b0bec5;
+    border-color: #2a3347;
+
+    &:hover {
+      background: #2a3347;
+      border-color: #374156;
+      color: #eceff1;
+    }
+  }
+}

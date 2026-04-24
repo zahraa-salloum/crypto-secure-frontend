@@ -10,6 +10,7 @@ export interface User {
   avatar?: string;
   userTypeId?: number;
   isAdmin?: boolean;
+  themePreference?: 'light' | 'dark';
   createdAt?: string;
 }
 

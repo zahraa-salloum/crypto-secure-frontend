@@ -8,6 +8,7 @@ import { RouterOutlet } from '@angular/router';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { DialogComponent } from './shared/components/dialog/dialog.component';
 import { AuthService } from './core/services/auth.service';
+import { ThemeService } from './core/services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +19,9 @@ import { AuthService } from './core/services/auth.service';
 })
 export class AppComponent implements OnInit {
   private authService = inject(AuthService);
+  // Injecting ThemeService here ensures it's instantiated on app startup,
+  // applying the persisted or OS-preferred theme before any rendering.
+  private themeService = inject(ThemeService);
   title = 'CryptoSecure';
 
   ngOnInit(): void {

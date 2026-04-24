@@ -60,6 +60,21 @@
   gap: var(--spacing-sm);
   justify-content: center;
   margin-bottom: var(--spacing-md);
+
+  /* "Learn More" outline btn sits on a colored gradient — force white outline */
+  .btn-outline {
+    border-color: rgba(255, 255, 255, 0.85);
+    color: #ffffff;
+    opacity: 0.75;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      border-color: #ffffff;
+      color: #ffffff;
+      opacity: 1;
+      text-decoration: none;
+    }
+  }
 }
 
 .security-warning {

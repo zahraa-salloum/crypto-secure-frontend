@@ -141,6 +141,27 @@
   margin-bottom: var(--spacing-md);
 }
 
+/* Dark mode override for educational notice */
+:host-context([data-theme="dark"]) {
+  .educational-notice {
+    background-color: rgba(245, 124, 0, 0.12);
+    border-left-color: #ffa726;
+
+    .notice-header h3 { color: #ffa726; }
+
+    p, strong { color: #ffcc80; }
+
+    .btn-outline {
+      border-color: #ffa726;
+      color: #ffa726;
+
+      &:hover {
+        background-color: rgba(245, 124, 0, 0.2);
+      }
+    }
+  }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .dashboard-header {

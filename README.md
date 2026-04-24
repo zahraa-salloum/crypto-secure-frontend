@@ -46,6 +46,14 @@ Security-themed color palette:
 - **Warning**: `#f57c00` (Orange)
 - **Danger**: `#c62828` (Red)
 
+### Dark Theme
+Full light/dark theme support with:
+- Toggle button in the navbar (sun/moon icon)
+- Preference persisted to `localStorage` (instant apply on every load)
+- Preference synced to the backend DB (`users.theme_preference`) when authenticated — choice survives across devices
+- On first visit, OS-level `prefers-color-scheme` is respected
+- Smooth CSS transitions on all color/background changes
+
 ### Spacing
 Uses an 8px grid system: 8, 16, 24, 32, 48, 64px
 
@@ -142,6 +150,7 @@ src/
 - ✅ Upload avatar (stored as base64)
 - ✅ Change password with live strength checklist (length, uppercase, number, special char)
 - ✅ Delete account
+- ✅ Dark / light theme toggle (persisted locally and synced to server)
 
 ## 🔧 Environment Configuration
 

@@ -101,3 +101,14 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
 }
+
+:host-context([data-theme="dark"]) {
+  .security-notice {
+    background-color: rgba(15, 20, 35, 0.85);
+    box-shadow: none;
+  }
+
+  .security-notice p {
+    color: #b0bec5;
+  }
+}

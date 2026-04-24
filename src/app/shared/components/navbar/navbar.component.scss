@@ -131,6 +131,23 @@
   padding: 0;
 }
 
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  transition: background-color var(--transition-base), color var(--transition-base), transform var(--transition-base);
+
+  &:hover {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-primary);
+    transform: rotate(20deg);
+  }
+}
+
 .user-avatar {
   display: flex;
   align-items: center;

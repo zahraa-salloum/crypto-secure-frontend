@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 import { Observable, BehaviorSubject, tap, catchError, throwError, fromEvent, merge, Subscription } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { User, LoginCredentials, RegisterData, AuthResponse } from '../../models/auth.models';
+import { ThemeService } from './theme.service';
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +42,8 @@ export class AuthService implements OnDestroy {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private themeService: ThemeService
   ) {
     // Validate token on service initialization
     this.validateStoredToken();
@@ -160,15 +162,18 @@ export class AuthService implements OnDestroy {
       tap(response => {
         if (response.data) {
           const user: User = {
-            id:         response.data.id,
-            name:       response.data.name,
-            email:      response.data.email,
-            avatar:     response.data.avatar,
-            userTypeId: response.data.user_type_id,
-            isAdmin:    response.data.isAdmin,
-            createdAt:  response.data.created_at
+            id:              response.data.id,
+            name:            response.data.name,
+            email:           response.data.email,
+            avatar:          response.data.avatar,
+            userTypeId:      response.data.user_type_id,
+            isAdmin:         response.data.isAdmin,
+            themePreference: response.data.theme_preference,
+            createdAt:       response.data.created_at
           };
           this.updateCurrentUser(user);
+          // Apply the user's server-stored theme preference
+          this.themeService.applyFromServer(user.themePreference ?? null);
         }
       }),
       catchError(error => {

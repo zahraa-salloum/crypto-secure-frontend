@@ -82,6 +82,23 @@
   margin-bottom: var(--spacing-sm);
 }
 
+/* Dark mode overrides for hardcoded colors */
+:host-context([data-theme="dark"]) {
+  .advantage {
+    background-color: rgba(46, 125, 50, 0.18);
+    border-color: rgba(165, 214, 167, 0.25);
+    h4 { color: #a5d6a7; }
+    li { color: var(--color-text-secondary); }
+  }
+
+  .disadvantage {
+    background-color: rgba(245, 124, 0, 0.18);
+    border-color: rgba(255, 204, 128, 0.25);
+    h4 { color: #ffcc80; }
+    li { color: var(--color-text-secondary); }
+  }
+}
+
 /* Algorithm Steps */
 .algorithm-intro {
   margin-bottom: var(--spacing-lg);
@@ -309,8 +326,8 @@
 }
 
 .cta-section p {
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: var(--spacing-lg);
-  opacity: 0.9;
 }
 
 .cta-buttons {
