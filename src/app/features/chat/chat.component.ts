@@ -3,7 +3,7 @@
  * Encrypted messaging interface with conversation management
  */
 
-import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ChatService } from '../../core/services/chat.service';
@@ -11,6 +11,8 @@ import { AuthService } from '../../core/services/auth.service';
 import { RC4Crypto } from '../../core/crypto/rc4.crypto';
 import { A51Crypto } from '../../core/crypto/a51.crypto';
 import { EncryptionService } from '../../core/services/encryption.service';
+import { FileShareQueueService } from '../../core/services/file-share-queue.service';
+import { FileEncryption } from '../../core/crypto/file-encryption.crypto';
 import { Conversation, Message } from '../../models/chat.models';
 import { EncryptionAlgorithm } from '../../models/encryption.models';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
@@ -24,13 +26,16 @@ import { DialogService } from '../../core/services/dialog.service';
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss'
 })
-export class ChatComponent implements OnInit, OnDestroy {
+export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
+  @ViewChild('messagesContainer') private messagesContainer!: ElementRef<HTMLDivElement>;
+  private shouldScrollToBottom = false;
   private chatService = inject(ChatService);
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
   private encryptionService = inject(EncryptionService);
   private toastService = inject(ToastService);
   private dialogService = inject(DialogService);
+  fileShareQueue = inject(FileShareQueueService);
   
   conversations = signal<Conversation[]>([]);
   selectedConversation = signal<Conversation | null>(null);
@@ -42,6 +47,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   sending = signal(false);
   loadingMessages = signal(false);
   mobileShowChat = signal(false);
+  /** IDs of shared files that no longer exist on the server */
+  deletedFileIds = signal<Set<number>>(new Set());
   
   messageForm: FormGroup;
   newConversationForm: FormGroup;
@@ -143,6 +150,22 @@ export class ChatComponent implements OnInit, OnDestroy {
         this.messages.set(messagesData);
         this.loadingMessages.set(false);
         this.markAsRead(conversationId);
+        this.shouldScrollToBottom = true;
+
+        // Batch-check which shared file IDs no longer exist so we never show a Download button for them
+        const fileIds = (messagesData as any[])
+          .map((m: any) => this.parseFileMessage(m.content)?.id)
+          .filter((id): id is number => id !== undefined && id !== null);
+
+        if (fileIds.length > 0) {
+          this.chatService.checkFilesExist(fileIds).subscribe({
+            next: ({ deleted }) => {
+              if (deleted.length > 0) {
+                this.deletedFileIds.update(set => new Set([...set, ...deleted]));
+              }
+            }
+          });
+        }
       },
       error: (error: any) => {
         console.error('Failed to load messages:', error);
@@ -175,6 +198,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         this.messages.update(msgs => [...msgs, messageData]);
         this.messageForm.reset();
         this.sending.set(false);
+        this.shouldScrollToBottom = true;
       },
       error: (error: any) => {
         console.error('Failed to send message:', error);
@@ -183,7 +207,109 @@ export class ChatComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
+  /**
+   * Send the queued file as a chat message.
+   * Only file metadata is sent — NO key. The recipient must enter the key manually.
+   * Format: __FILE__:<JSON> — encrypted with the conversation key just like text.
+   */
+  sendFileMessage(): void {
+    const conversation = this.selectedConversation();
+    const queued = this.fileShareQueue.queuedFile();
+    if (!conversation || !queued) return;
+
+    const keyData = this.conversationKeys.get(conversation.id);
+    if (!keyData) {
+      this.toastService.error('No encryption key available for this conversation');
+      return;
+    }
+
+    const payload = JSON.stringify({
+      id: queued.file.id,
+      name: queued.file.original_filename,
+      size: queued.file.file_size,
+      algo: queued.file.algorithm,
+    });
+
+    this.sending.set(true);
+    this.chatService.sendMessage(conversation.id, `__FILE__:${payload}`, keyData.key, keyData.algorithm).subscribe({
+      next: (response: any) => {
+        const messageData = response.data || response;
+        // Attach the decoded content so the template can render a file card immediately
+        messageData.content = `__FILE__:${payload}`;
+        this.messages.update(msgs => [...msgs, messageData]);
+        this.fileShareQueue.dequeue();
+        this.sending.set(false);
+        this.shouldScrollToBottom = true;
+        this.toastService.success('📎 File shared successfully!');
+      },
+      error: (error: any) => {
+        console.error('Failed to send file message:', error);
+        this.toastService.error('Failed to share file');
+        this.sending.set(false);
+      }
+    });
+  }
+
+  /** Parse a file message content string into its metadata object */
+  parseFileMessage(content: string): { id: number; name: string; size: number; algo: string } | null {
+    if (!content?.startsWith('__FILE__:')) return null;
+    try {
+      return JSON.parse(content.slice('__FILE__:'.length));
+    } catch {
+      return null;
+    }
+  }
+
+  /** Download a file that was shared in a chat message — recipient enters the key manually */
+  downloadSharedFile(fileId: number, originalName: string, algo: string): void {
+    // Fetch the encrypted file first; only prompt for key if it actually exists
+    this.chatService.downloadSharedFile(fileId).subscribe({
+      next: async (blob: Blob) => {
+        const fileKey = await this.dialogService.prompt(
+          'Enter Decryption Key',
+          `Enter the key to decrypt "${originalName}" (${algo}):`,
+          'Decryption key...'
+        );
+        if (!fileKey) return;
+        try {
+          const decryptedBlob = await FileEncryption.decryptFile(blob, fileKey, algo as 'RC4' | 'A5/1', originalName);
+          const url = URL.createObjectURL(decryptedBlob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = originalName;
+          a.click();
+          URL.revokeObjectURL(url);
+          this.toastService.success(`✓ "${originalName}" downloaded and decrypted!`);
+        } catch {
+          this.toastService.error('Incorrect key — could not decrypt the file.');
+        }
+      },
+      error: (err: any) => {
+        if (err?.status === 404) {
+          // Mark this file as deleted so the card updates inline
+          this.deletedFileIds.update(set => new Set([...set, fileId]));
+        } else {
+          this.toastService.error('Failed to download file');
+        }
+      }
+    });
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.shouldScrollToBottom) {
+      this.shouldScrollToBottom = false;
+      this.scrollToBottom();
+    }
+  }
+
+  private scrollToBottom(): void {
+    try {
+      const el = this.messagesContainer?.nativeElement;
+      if (el) el.scrollTop = el.scrollHeight;
+    } catch {}
+  }
+
   createConversation(): void {
     if (this.newConversationForm.invalid) {
       return;

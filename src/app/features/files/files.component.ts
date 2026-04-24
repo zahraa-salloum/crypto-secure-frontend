@@ -6,6 +6,7 @@
 import { Component, inject, signal, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { FileService } from '../../core/services/file.service';
 import { EncryptionService } from '../../core/services/encryption.service';
 import { EncryptionAlgorithm } from '../../models/encryption.models';
@@ -16,6 +17,7 @@ import { RC4Crypto } from '../../core/crypto/rc4.crypto';
 import { A51Crypto } from '../../core/crypto/a51.crypto';
 import { ToastService } from '../../core/services/toast.service';
 import { DialogService } from '../../core/services/dialog.service';
+import { FileShareQueueService } from '../../core/services/file-share-queue.service';
 
 @Component({
   selector: 'app-files',
@@ -30,6 +32,8 @@ export class FilesComponent implements OnInit {
   private encryptionService = inject(EncryptionService);
   private toastService = inject(ToastService);
   private dialogService = inject(DialogService);
+  private fileShareQueue = inject(FileShareQueueService);
+  private router = inject(Router);
   
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   
@@ -325,5 +329,11 @@ export class FilesComponent implements OnInit {
     if (diffDays < 7) return `${diffDays} days ago`;
     
     return date.toLocaleDateString();
+  }
+
+  shareInChat(file: UploadedFile): void {
+    this.fileShareQueue.enqueue(file);
+    this.toastService.success('📎 File queued! Select a conversation to send it.');
+    this.router.navigate(['/chat']);
   }
 }

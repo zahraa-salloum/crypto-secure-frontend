@@ -61,7 +61,7 @@ src/
 │   │   ├── crypto/          # RC4 and A5/1 client-side implementations
 │   │   ├── guards/          # Auth and admin route guards
 │   │   ├── interceptors/    # HTTP auth & error interceptors
-│   │   └── services/        # Auth, chat, file, encryption services
+│   │   └── services/        # Auth, chat, file, encryption, file-share-queue services
 │   ├── features/
 │   │   ├── auth/            # Login, register, forgot/reset password
 │   │   ├── admin/           # Admin dashboard (stats, user management)
@@ -118,6 +118,12 @@ src/
 - ✅ Per-message nonce combined with key to prevent keystream reuse
 - ✅ Per-conversation encryption key
 - ✅ Messages stored encrypted on server
+- ✅ Auto-scroll to bottom on conversation open and new message
+- ✅ Loading spinner while messages fetch; stale messages cleared immediately on switch
+- ✅ Mobile back-to-list navigation
+- ✅ **File sharing in chat**: queue a file from /files → navigate to /chat → send as an encrypted file card
+- ✅ Recipient clicks Download, enters decryption key manually (key never transmitted)
+- ✅ Deleted files detected at load time via batch API — Download button replaced with “🗑️ File deleted” label
 
 ### File Encryption
 - ✅ Client-side file encryption (RC4 or A5/1) before upload
@@ -125,6 +131,7 @@ src/
 - ✅ Client-side decryption on download
 - ✅ Key never sent to server
 - ✅ Per-user file limit (10 files)
+- ✅ "Share in Chat" button — queues a file for sending in a conversation
 
 ### Text Encryption Tool
 - ✅ Encrypt/decrypt text with RC4 or A5/1
@@ -133,7 +140,7 @@ src/
 ### Profile
 - ✅ Update display name
 - ✅ Upload avatar (stored as base64)
-- ✅ Change password with strength validation
+- ✅ Change password with live strength checklist (length, uppercase, number, special char)
 - ✅ Delete account
 
 ## 🔧 Environment Configuration

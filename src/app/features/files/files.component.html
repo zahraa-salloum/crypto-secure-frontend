@@ -186,6 +186,13 @@
                   🔓 Decrypt
                 </button>
                 <button
+                  class="btn btn-sm btn-secondary"
+                  (click)="shareInChat(file)"
+                  title="Share in Chat"
+                >
+                  💬 Share
+                </button>
+                <button
                   class="btn btn-sm btn-danger"
                   (click)="deleteFile(file.id)"
                   title="Delete"

@@ -106,7 +106,27 @@
               >
                 <div class="message-bubble">
                   <div class="message-content">
-                    {{ message.content }}
+                    @if (parseFileMessage(message.content); as fileMeta) {
+                      <div class="file-message-bubble">
+                        <div class="file-icon">📎</div>
+                        <div class="file-meta">
+                          <span class="file-name">{{ fileMeta.name }}</span>
+                          <span class="file-size">{{ (fileMeta.size / 1024).toFixed(1) }} KB · {{ fileMeta.algo }}</span>
+                        </div>
+                        @if (deletedFileIds().has(fileMeta.id)) {
+                          <span class="file-deleted-label">🗑️ File deleted</span>
+                        } @else {
+                          <button
+                            class="btn btn-sm btn-primary file-download-btn"
+                            (click)="downloadSharedFile(fileMeta.id, fileMeta.name, fileMeta.algo)"
+                          >
+                            ⬇️ Download
+                          </button>
+                        }
+                      </div>
+                    } @else {
+                      {{ message.content }}
+                    }
                   </div>
                   <div class="message-meta">
                     <span class="message-time">{{ formatMessageTime(message.created_at) }}</span>
@@ -125,6 +145,22 @@
             }
           </div>
           
+          <!-- File Share Queue Banner -->
+          @if (fileShareQueue.queuedFile()) {
+            <div class="queue-banner">
+              <span class="queue-icon">📎</span>
+              <span class="queue-label">
+                Ready to share: <strong>{{ fileShareQueue.queuedFile()!.file.original_filename }}</strong>
+              </span>
+              <button class="btn btn-sm btn-primary" (click)="sendFileMessage()" [disabled]="sending()">
+                Send
+              </button>
+              <button class="btn btn-sm btn-ghost" (click)="fileShareQueue.dequeue()" title="Dismiss">
+                ✕
+              </button>
+            </div>
+          }
+
           <!-- Message Input -->
           <div class="message-input-area">
             <form [formGroup]="messageForm" (ngSubmit)="sendMessage()">

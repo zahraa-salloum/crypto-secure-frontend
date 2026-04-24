@@ -177,5 +177,23 @@ export class ChatService {
   markAsRead(conversationId: number): Observable<any> {
     return this.http.post<any>(`${this.API_URL}/conversations/${conversationId}/mark-read`, {});
   }
-  
+
+  /**
+   * Batch-check which shared file IDs have been deleted from the server.
+   * Returns the array of IDs that no longer exist.
+   */
+  checkFilesExist(ids: number[]): Observable<{ deleted: number[] }> {
+    return this.http.post<{ deleted: number[] }>(`${this.API_URL}/files/check-exists`, { ids });
+  }
+
+  /**
+   * Download a file that was shared in a chat message.
+   * Backend verifies the requester is in a conversation with the file owner.
+   */
+  downloadSharedFile(fileId: number): Observable<Blob> {
+    return this.http.get(`${this.API_URL}/files/${fileId}/download`, {
+      responseType: 'blob'
+    });
+  }
+
 }
