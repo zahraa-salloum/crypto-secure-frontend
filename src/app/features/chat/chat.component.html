@@ -85,7 +85,12 @@
           
           <!-- Messages Area -->
           <div class="messages-container" #messagesContainer>
-            @if (messages().length === 0) {
+            @if (loadingMessages()) {
+              <div class="messages-loader">
+                <div class="loader-spinner"></div>
+                <p>Loading messages...</p>
+              </div>
+            } @else if (messages().length === 0) {
               <div class="empty-messages">
                 <div class="empty-icon">🔐</div>
                 <p>No messages yet</p>

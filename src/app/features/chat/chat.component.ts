@@ -40,6 +40,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   showNewConversation = signal(false);
   showEncryptionSettings = signal(false);
   sending = signal(false);
+  loadingMessages = signal(false);
   mobileShowChat = signal(false);
   
   messageForm: FormGroup;
@@ -131,16 +132,22 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.toastService.error('No encryption key available for this conversation');
       return;
     }
-    
+
+    // Clear messages immediately so old chat doesn't linger while new one loads
+    this.messages.set([]);
+    this.loadingMessages.set(true);
+
     this.chatService.getMessages(conversationId, keyData.key, keyData.algorithm).subscribe({
       next: (response: any) => {
         const messagesData = response.data || response || [];
         this.messages.set(messagesData);
+        this.loadingMessages.set(false);
         this.markAsRead(conversationId);
       },
       error: (error: any) => {
         console.error('Failed to load messages:', error);
         this.toastService.error('Failed to load messages');
+        this.loadingMessages.set(false);
       }
     });
   }
